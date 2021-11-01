@@ -121,56 +121,30 @@ function DrawProvider({ children }) {
     });
    };
  
-   const create_sEvent = async (data) => {
+  const create_sEvent = async (data) => {
     const response = await axios.post("/api/draw/create_sEvent", data);
     const { current_event } = response.data;
- 
-    dispatch({
-      type: "SET_CURRENT_EVENT",
-      payload: {
-        current_event,
-      },
-    });
-   };
- 
-   const create_mEvent = async (data) => {
-    const response = await axios.post("/api/draw/create_mEvent", data);
-    
-    const { current_event } = response.data;
- 
-    dispatch({
-      type: "SET_CURRENT_EVENT",
-      payload: {
-        current_event,
-      },
-    });
-   };
 
+    dispatch({
+      type: "SET_CURRENT_EVENT",
+      payload: {
+        current_event,
+      },
+    });
+  };
+ 
   const create_mEvent = async (data) => {
-    const response = await axios.post('/api/draw/create_mEvent', data)
+    const response = await axios.post("/api/draw/create_mEvent", data);
 
-    const { current_event } = response.data
+    const { current_event } = response.data;
 
     dispatch({
-      type: 'SET_CURRENT_EVENT',
+      type: "SET_CURRENT_EVENT",
       payload: {
         current_event,
       },
-    })
-  }
-
-  const create_sEvent = async (data) => {
-    const response = await axios.post('/api/draw/create_sEvent', data)
-
-    const { current_event } = response.data
-
-    dispatch({
-      type: 'SET_CURRENT_EVENT',
-      payload: {
-        current_event,
-      },
-    })
-  }
+    });
+  };
 
   /**
    * Get 12 random tables
