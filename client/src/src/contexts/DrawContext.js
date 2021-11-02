@@ -10,6 +10,7 @@ const initialState = {
   current_event: null,
   tables: [],
   users: [],
+  days: [],
   expectedUsersAmount: 0,
 }
 
@@ -59,6 +60,13 @@ const handlers = {
       users: [],
     }
   },
+  SET_DAYS: (state, action) => {
+    const { days } = action.payload
+    return {
+      ...state,
+      days,
+    }
+  },
   PRODUCTS: (state, action) => {
     const { products } = action.payload
     return {
@@ -66,7 +74,6 @@ const handlers = {
       products,
     }
   },
-  
 }
 
 const reducer = (state, action) =>
@@ -77,13 +84,16 @@ const DrawContext = createContext({
   create_event: () => Promise.resolve(),
   create_sEvent: () => Promise.resolve(),
   create_mEvent: () => Promise.resolve(),
+
   getRandomTables: () => Promise.resolve(),
   getRandomTablesByUserId: () => Promise.resolve(),
   getSearchData: () => Promise.resolve(),
   clearUsers: () => Promise.resolve(),
+  getRandomTablesByDayIdAndRoomNumber: () => Promise.resolve(),
+  getAllDays: () => Promise.resolve(),
+
   getProducts: () => Promise.resolve(),
   purchase: () => Promise.resolve(),
-  getCurrentEvent: () => Promise.resolve()
 })
 
 function DrawProvider({ children }) {
@@ -95,14 +105,8 @@ function DrawProvider({ children }) {
     initialize()
   }, [])
 
-  // Get Current Event
-  const getCurrentEvent = async () => {
-    console.log('disx')
-    await axios.get("/api/draw/getCurrentEvent");
-    console.log('data')
-  }
-
   // Create Events
+  
   const create_event = async (data) => {
     const response = await axios.post("/api/draw/create_event", data);
     
@@ -117,31 +121,30 @@ function DrawProvider({ children }) {
     });
    };
  
-   const create_sEvent = async (data) => {
+  const create_sEvent = async (data) => {
     const response = await axios.post("/api/draw/create_sEvent", data);
     const { current_event } = response.data;
- 
-    dispatch({
-      type: "SET_CURRENT_EVENT",
-      payload: {
-        current_event,
-      },
-    });
-   };
 
- 
-   const create_mEvent = async (data) => {
-    const response = await axios.post("/api/draw/create_mEvent", data);
-    
-    const { current_event } = response.data;
- 
     dispatch({
       type: "SET_CURRENT_EVENT",
       payload: {
         current_event,
       },
     });
-   };
+  };
+ 
+  const create_mEvent = async (data) => {
+    const response = await axios.post("/api/draw/create_mEvent", data);
+
+    const { current_event } = response.data;
+
+    dispatch({
+      type: "SET_CURRENT_EVENT",
+      payload: {
+        current_event,
+      },
+    });
+  };
 
   /**
    * Get 12 random tables
@@ -214,6 +217,37 @@ function DrawProvider({ children }) {
     })
   }
 
+  const getRandomTablesByDayIdAndRoomNumber = async (reqData) => {
+    const response = await axios.post(
+      '/api/draw/getRandomTablesByDayIdAndRoomNumber',
+      reqData,
+    )
+    const { status, data } = response
+
+    if (status === 200) {
+      dispatch({
+        type: 'SET_TABLES',
+        payload: {
+          tables: data,
+        },
+      })
+    }
+  }
+
+  const getAllDays = async () => {
+    const response = await axios.get('/api/draw/getAllDays')
+    const { status, data } = response
+
+    if (status === 200) {
+      dispatch({
+        type: 'SET_DAYS',
+        payload: {
+          days: data,
+        },
+      })
+    }
+  }
+
   const getProducts = async () => {
     const response = await axios.get('/api/draw/products')
     const { products } = response.data
@@ -241,7 +275,6 @@ function DrawProvider({ children }) {
     <DrawContext.Provider
       value={{
         ...state,
-        getCurrentEvent,
         create_event,
         create_sEvent,
         create_mEvent,
@@ -251,6 +284,7 @@ function DrawProvider({ children }) {
         clearUsers,
         getProducts,
         purchase,
+        getAllDays
       }}
     >
       {children}

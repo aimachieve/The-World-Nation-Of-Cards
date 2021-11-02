@@ -13,14 +13,23 @@ router.get(
   '/getRandomTablesByUserId/:userId',
   DrawController.getRandomTablesByUserId,
 )
+router.get(
+  '/getRandomTablesByRoomId/:roomId',
+  DrawController.getRandomTablesByRoomId,
+)
+router.get('/getAllDays', DrawController.getAllDays)
 router.post('/search', DrawController.searchData)
 router.post('/getAllUsers', DrawController.getAllUsers)
+router.post(
+  '/getRandomTablesByDayIdAndRoomNumber',
+  DrawController.getRandomTablesByDayIdAndRoomNumber,
+)
+/*======================================*/
 router.post("/payment", DrawController.payment);
-
-// admin
 router.post("/create_event", DrawController.create_Event);
 router.post("/create_sEvent", DrawController.create_sEvent);
 router.post("/create_mEvent", DrawController.create_mEvent);
-router.get("/getCurrentEvent", DrawController.getCurrentEvent);
+
+router.get("/get_tickets", DrawController.get_tickets);
 
 module.exports = router

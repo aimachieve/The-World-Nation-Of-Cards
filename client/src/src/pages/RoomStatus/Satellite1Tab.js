@@ -12,7 +12,7 @@ import {
   TableCell,
   TableBody,
 } from '@material-ui/core'
-export default function Satellite2Tab() {
+export default function Satellite1Tab() {
   return (
     <Stack spacing={2}>
       <Stack direction="row">
@@ -25,7 +25,7 @@ export default function Satellite2Tab() {
           Search
         </Button>
       </Stack>
-      <TableContainer>
+      <TableContainer sx={{ minHeight: 1200 }}>
         <Table>
           <TableHead>
             <TableRow>
@@ -36,7 +36,7 @@ export default function Satellite2Tab() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((item) => (
+            {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map((item) => (
               <TableRow key={item}>
                 <TableCell>smokeypetel123</TableCell>
                 <TableCell>15</TableCell>

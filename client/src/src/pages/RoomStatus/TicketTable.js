@@ -34,7 +34,7 @@ export default function TicketTable({ table }) {
               align="center"
               fontWeight="bold"
             >
-              {table.table}
+              {table.table + 1}
             </Typography>
           </Paper>
         </Stack>

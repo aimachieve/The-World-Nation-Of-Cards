@@ -64,6 +64,7 @@ const AuthContext = createContext({
   login: () => Promise.resolve(),
   logout: () => Promise.resolve(),
   register: () => Promise.resolve(),
+  updateProfile: () => Promise.resolve(),
 });
 
 function AuthProvider({ children }) {
@@ -142,6 +143,26 @@ function AuthProvider({ children }) {
     });
   };
 
+  const updateProfile = async (data) => {
+    const response = await axios.post("/api/account/update", data);
+
+    const { user } = response.data;
+
+    window.localStorage.setItem('user', JSON.stringify(user));
+
+    dispatch({
+      type: "REGISTER",
+      payload: {
+        user,
+      },
+    });
+
+    if(response.status === 200) {
+      window.alert("Successfully updated."); 
+      dispatch(logout());
+    }
+  };
+
   const verifyEmail = async (code) => {
     const response = await axios.post("/api/account/verify-email", {
       code,
@@ -174,8 +195,6 @@ function AuthProvider({ children }) {
   };
 
   const resetPassword = () => {};
-
-  const updateProfile = () => {};
 
   return (
     <AuthContext.Provider

@@ -8,6 +8,10 @@ const SatelliteTicketSchema = new Schema(
       type: Schema.ObjectId,
       ref: 'users'
     },
+    event: {
+      type: Schema.ObjectId,
+      ref: 'events',
+    },
     status: {
       type: Boolean,
       default: true

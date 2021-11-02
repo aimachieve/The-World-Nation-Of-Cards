@@ -18,7 +18,7 @@ import useDraw from 'hooks/useDraw'
 export default function MainEventTab() {
   const { getSearchData, users, expectedUsersAmount, clearUsers } = useDraw()
   const [searchKey, setSearchKey] = useState('')
-  const [pageSize, setPageSize] = useState(10)
+  const [pageSize, setPageSize] = useState(15)
   const [pageNumber, setPageNumber] = useState(1)
 
   useEffect(() => {
@@ -67,7 +67,7 @@ export default function MainEventTab() {
         dataLength={pageSize}
         hasMore={users.length === expectedUsersAmount ? false : true}
         next={fetchNextData}
-        height={800}
+        height={1200}
         loader={
           users.length === expectedUsersAmount ? (
             <h4>The end</h4>

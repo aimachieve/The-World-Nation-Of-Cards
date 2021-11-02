@@ -9,6 +9,10 @@ const TableSchema = new Schema(
       require: true,
       unique: true,
     },
+    day: {
+      type: Schema.ObjectId,
+      ref: 'days'
+    },
     seat: [
       {
         type: Schema.ObjectId,

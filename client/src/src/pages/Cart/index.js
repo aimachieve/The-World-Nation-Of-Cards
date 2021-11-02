@@ -71,6 +71,7 @@ export default function Cart() {
   const { purchase } = useDraw()
   const { cart } = useCart()
 
+  const [userid, setUserID] = useState('')
   const [firstname, setFirstname] = useState('')
   const [lastname, setLastname] = useState('')
   const [company, setCompany] = useState('')
@@ -95,6 +96,7 @@ export default function Cart() {
     }
 
     let user = {
+      id: userid,
       xBillFirstName: firstname,
       xBillLastName: lastname,
       xBillCompany: company,
@@ -117,6 +119,7 @@ export default function Cart() {
       window.location.href = '/auth/login'
     }
     user = JSON.parse(user)
+    setUserID(user._id)
     setFirstname(user.username.split(' ')[0])
     setLastname(user.username.split(' ')[1])
     setCompany(user.company)

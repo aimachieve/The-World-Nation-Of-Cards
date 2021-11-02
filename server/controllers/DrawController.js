@@ -1,3 +1,4 @@
+const mongoose = require('mongoose')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const keys = require('../config/keys')
@@ -13,6 +14,8 @@ const Event = require('../models/Event')
 const MainTicket = require('../models/MainTicket')
 const SatelliteTicket = require('../models/SatelliteTicket')
 const Table = require('../models/Table')
+const Day = require('../models/Day')
+const Room = require('../models/Room')
 
 let otp
 
@@ -25,18 +28,10 @@ exports.getProducts = (req, res) => {
 }
 
 /**
- * Temp controller of createTable
- * @param {object} req
- * @param {object} res
- */
-exports.createTable = (req, res) => {
-  console.log(req.body)
-}
-
-/**
  * Get 12 random tables from DB.
  * @param {object} req
  * @param {object} res
+ * @returns
  */
 exports.getRandomTables = async (req, res) => {
   const tables = await Table.aggregate([{ $sample: { size: 12 } }])
@@ -174,6 +169,30 @@ exports.getAllUsers = async (req, res) => {
   )
 }
 
+/**
+ * Get all days
+ * @param {object} req
+ * @param {object} res
+ */
+exports.getAllDays = (req, res) => {
+  Day.find()
+    .populate('rooms')
+    .then((results) => {
+      if (results.length === 0) {
+        return res.status(404).send('No Data')
+      } else {
+        return res.status(200).json(results)
+      }
+    })
+    .catch((error) => res.status(500).send('Server Error'))
+}
+
+exports.getRandomTablesByDayIdAndRoomNumber = async (req, res) => {
+  // const { dayId, roomnumber } = req.body
+  // const tablesByDayId = 
+}
+/*========================================================*/
+
 exports.payment = async (req, res) => {
   let xKey = keys.cardknoxKey
   let xSoftwareName = keys.xSoftwareName
@@ -216,19 +235,28 @@ exports.payment = async (req, res) => {
     function (error, response, body) {
       data = qs.parse(body)
       console.log(data)
+      // let event = await Event.findOne({status: 0});
+
+      // var newMainTicket = {}
+
+      // User.find().then(async (users) => {
+      //   for (var j = 0; j < 5; j++) {
+      //     console.log(i + '-----' + j)
+      //     newMainTicket = new MainTicket({
+      //       user_id: users[i]._id,
+      //       username: users[i].name,
+      //       event: event._id
+      //     })
+      //     await newMainTicket.save()
+      //   }
+      // })
+
       res.json(data)
     },
   )
 }
 
 /*========================= Admin page =============================*/
-// Get Current Event
-exports.getCurrentEvent = async (req, res) => {
-    Event.find({ status: { $lt: 3}}).then(result => {
-      console.log(result)
-      res.json(result)
-    })
-};
 // Create New Evnet
 exports.create_Event = (req, res) => {
   const newEvent = new Event({
@@ -285,26 +313,31 @@ exports.create_mEvent = async (req, res) => {
   });
 };
 
+/**
+ * Get random tables by room id
+ * @param {object} req
+ * @param {object} res
+ */
+exports.getRandomTablesByRoomId = async (req, res) => {
+  const { roomId } = req.params
+}
+
+/*========================= CartPage =============================*/
+exports.get_tickets = async (req, res) => {
+  const current_event = await Event.findOne({status: 0});
+
+  let tickets = [];
+
+  tickets.push(current_event.main);
+  tickets.psuh(current_event.satellite);
+
+  res.json({
+    success: true,
+    tickets
+  });
+};
+/*========================= CartPage =============================*/
 
 /*========================= Create Mock Data =============================*/
-exports.createMockData = async (req, res) => {
-  var tables = await Table.find()
-
-  for (var i = tables.length - 1; i >= 0; i--) {
-    let temp = tables[i].seat
-
-    for (var j = temp.length - 1; j > 2; j--) {
-      let rand = Math.ceil(Math.random() * 100) % temp.length
-
-      await MainTicket.findOneAndUpdate(
-        { _id: temp[rand]._id },
-        { $set: { status: false } },
-      )
-
-      temp.splice(rand, 1)
-    }
-    console.log('temp-length----->', i)
-    // await Table.findOneAndUpdate({ _id: tables[i]._id }, {$set: {'seat': temp} })
-  }
-}
+exports.createMockData = async (req, res) => {}
 /*========================================================================*/

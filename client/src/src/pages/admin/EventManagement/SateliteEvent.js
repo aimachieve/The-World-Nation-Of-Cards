@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { styled } from '@material-ui/core/styles'
 import { Grid, Container, Typography, Button, TextField } from '@material-ui/core';
 import { DatePicker, StaticDatePicker, MobileDatePicker, DesktopDatePicker, DesktopTimePicker } from '@material-ui/lab';
@@ -31,39 +31,32 @@ const MainStyle = styled('div')(({ theme }) => ({
 
 
 export default function SateliteEvent() {
-  const { isCreatedEvent, current_event, create_sEvent, getCurrentEvent  } = useDraw();
+  const { isCreatedEvent, current_event, create_sEvent  } = useDraw();
 
   const [formData, setFormData] = useState({
+    date: new Date(),
+    price: '',
+    entries: '',
+    winners: '',
   });
 
-  const [date, setDate] = useState('');
-
-  const { price, entries, winners } = formData;
+  const { date, price, entries, winners } = formData;
 
   const onChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    console.log({ price, entries, winners })
     await create_sEvent({ 
       id: current_event._id,
       date, 
       price, 
       entries, 
       winners });
-    alert('Created "Satellite Event" Successfully');
-    setFormData({
-      date: new Date(),
-      price: '',
-      entries: '',
-      winners: '',
-    })
+    
   };
 
-  useEffect(() => {
-    console.log("fsdafs")
-    // getCurrentEvent();
-  });
   return (
     <RootStyle>
       <ContentStyle>
@@ -115,12 +108,6 @@ export default function SateliteEvent() {
                       label="For desktop"
                       name="date"
                       value={date}
-                      onChange={(date) => {
-                        setDate(date);
-                      }}
-                      onChange={(date) => {
-                        setDate(date);
-                      }}
                       minDate={new Date()}
                       components={{
                         OpenPickerIcon: ExpandMoreRoundedIcon

@@ -8,6 +8,10 @@ const MainTicketSchema = new Schema(
       type: Schema.ObjectId,
       ref: 'users',
     },
+    event: {
+      type: Schema.ObjectId,
+      ref: 'events',
+    },
     username: {
       type: String,
       require: true,
@@ -23,6 +27,9 @@ const MainTicketSchema = new Schema(
         table: {
           type: Number,
         },
+        status: {
+          type: Boolean
+        }
       },
     ],
     status: {

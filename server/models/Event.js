@@ -36,7 +36,7 @@ const EventSchema = new Schema(
           type: Date,
           default: Date.now 
         }
-      }
+      },
     ],
     status: {
       type: Number,

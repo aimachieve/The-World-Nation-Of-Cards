@@ -1,5 +1,6 @@
 /* eslint-disable */
 // material
+import React, {useState, useEffect} from 'react'
 import { styled } from '@material-ui/core/styles'
 // components
 import Page from '../../../components/Page'
@@ -22,7 +23,46 @@ const ContentStyle = styled('div')(({ theme }) => ({
 }))
 
 export default function Account() {
-  const { logout } = useAuth();
+  const { logout, updateProfile } = useAuth();
+
+  const [id, setID] = useState("");
+  const [phone, setPhone] = useState("");
+  const [firstname, setFirstname] = useState("");
+  const [lastname, setLastname] = useState("");
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [newpassword1, setNewpassword1] = useState("");
+  const [newpassword2, setNewpassword2] = useState("");
+
+  useEffect(() => {
+    let user = localStorage.getItem('user');
+    user = JSON.parse(user);
+    setID(user._id);
+    setPhone(user.phone);
+    setFirstname(user.name.split(' ')[0]);
+    setLastname(user.name.split(' ')[1]);
+    setUsername(user.username);
+    setEmail(user.email);
+  }, [])
+
+  const updateUser = () => {
+    if(newpassword1 !== newpassword2) {
+      window.alert("please enter your new password");
+      return;
+    }
+
+    updateProfile({
+      id,
+      phone,
+      firstname,
+      lastname,
+      username,
+      email,
+      password,
+      newpassword1
+    })
+  }
 
   return (
     <RootStyle>
@@ -75,9 +115,11 @@ export default function Account() {
                     </Typography>
                     <TextField
                       fullWidth
-                      autoComplete="username"
-                      label="Enter your first name"
+                      autoComplete="mobilenumber"
+                      label="Enter your mobile number"
                       sx={{marginTop: '10px !important'}}
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
                     />
                   </Grid>
                 </Grid>
@@ -89,9 +131,11 @@ export default function Account() {
                     </Typography>
                     <TextField
                       fullWidth
-                      autoComplete="username"
+                      autoComplete="firstname"
                       label="Enter your first name"
                       sx={{marginTop: '10px !important'}}
+                      value={firstname}
+                      onChange={(e) => setFirstname(e.target.value)}
                     />
                   </Grid>
                 </Grid>
@@ -103,9 +147,11 @@ export default function Account() {
                     </Typography>
                     <TextField
                       fullWidth
-                      autoComplete="current-password"
-                      label="Enter your subject"
+                      autoComplete="lastname"
+                      label="Enter your lastname"
                       sx={{marginTop: '10px !important'}}
+                      value={lastname}
+                      onChange={(e) => setLastname(e.target.value)}
                     />
                   </Grid>
                 </Grid>
@@ -117,9 +163,11 @@ export default function Account() {
                     </Typography>
                     <TextField
                       fullWidth
-                      autoComplete="username"
-                      label="Enter your first name"
+                      autoComplete="displayname"
+                      label="Enter your display name"
                       sx={{marginTop: '10px !important'}}
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
                     />
                   </Grid>
                 </Grid>
@@ -131,9 +179,12 @@ export default function Account() {
                     </Typography>
                     <TextField
                       fullWidth
-                      autoComplete="username"
-                      label="Enter your first name"
+                      autoComplete="email"
+                      label="Enter your email address"
                       sx={{marginTop: '10px !important'}}
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                     />
                     <Typography variant="h4" sx={{mt: 3, fontWeight: '300'}}>
                       Password Change
@@ -148,9 +199,12 @@ export default function Account() {
                     </Typography>
                     <TextField
                       fullWidth
-                      autoComplete="username"
-                      label="Enter your first name"
+                      autoComplete="password"
+                      label="Enter your current password"
+                      type="password"
                       sx={{marginTop: '10px !important'}}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                     />
                   </Grid>
                 </Grid>
@@ -162,9 +216,12 @@ export default function Account() {
                     </Typography>
                     <TextField
                       fullWidth
-                      autoComplete="username"
-                      label="Enter your first name"
+                      autoComplete="newpassword"
+                      label="Enter your new password"
+                      type="password"
                       sx={{marginTop: '10px !important'}}
+                      value={newpassword1}
+                      onChange={(e) => setNewpassword1(e.target.value)}
                     />
                   </Grid>
                 </Grid>
@@ -176,12 +233,15 @@ export default function Account() {
                     </Typography>
                     <TextField
                       fullWidth
-                      autoComplete="username"
-                      label="Enter your first name"
+                      autoComplete="confirmpassword"
+                      type="password"
+                      label="Confirm your password"
                       sx={{marginTop: '10px !important'}}
+                      value={newpassword2}
+                      onChange={(e) => setNewpassword2(e.target.value)}
                     />
 
-                    <LoadingButton size="large" type="submit" variant="contained" sx={{ backgroundColor: '#2fc557', boxShadow: 'none', mt: 3 }}>
+                    <LoadingButton size="large" type="submit" variant="contained" sx={{ backgroundColor: '#2fc557', boxShadow: 'none', mt: 3 }} onClick={updateUser}>
                       Save Change
                     </LoadingButton>
                   </Grid>
