@@ -97,6 +97,7 @@ const reducer = (state, action) =>
 
 const DrawContext = createContext({
   ...initialState,
+  // Create Event and Satellite in admin
   create_event: () => Promise.resolve(),
   create_sEvent: () => Promise.resolve(),
   create_mEvent: () => Promise.resolve(),

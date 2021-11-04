@@ -36,7 +36,7 @@ CarouselItem.propTypes = {
 function CarouselItem({ currentEvent, item, index }) {
   console.log(item, index)
   const theme = useTheme()
-  
+
   const register = (index, item) => {
     let user = localStorage.getItem('user')
     let cart = localStorage.getItem('cart')
@@ -46,11 +46,11 @@ function CarouselItem({ currentEvent, item, index }) {
       window.location.href = '/auth/login'
     }
 
-    const userInfo = JSON.parse( user );
-    const cartInfo = JSON.parse( cart );
+    const userInfo = JSON.parse(user);
+    const cartInfo = JSON.parse(cart);
 
     if (index === 0) {
-      if ( cartInfo.length === 0) {
+      if (cartInfo.length === 0) {
         cartInfo.push({
           index: index,
           user_id: userInfo._id,
@@ -62,10 +62,10 @@ function CarouselItem({ currentEvent, item, index }) {
 
         window.localStorage.setItem(
           'cart',
-          JSON.stringify( cartInfo ),
+          JSON.stringify(cartInfo),
         )
       } else {
-        let exist = cartInfo.filter(item => item.index === index )
+        let exist = cartInfo.filter(item => item.index === index)
         if (exist.length === 0) {
           cartInfo.push({
             index: index,
@@ -75,15 +75,15 @@ function CarouselItem({ currentEvent, item, index }) {
             username: userInfo.username,
             qty: 0
           })
-  
+
           window.localStorage.setItem(
             'cart',
-            JSON.stringify( cartInfo ),
+            JSON.stringify(cartInfo),
           )
         }
       }
     } else {
-      if ( cartInfo.length === 0) {
+      if (cartInfo.length === 0) {
         cartInfo.push({
           index: index,
           user_id: userInfo._id,
@@ -91,14 +91,14 @@ function CarouselItem({ currentEvent, item, index }) {
           satelliteId: item._id,
           price: item.price,
           qty: 0
-        })       
+        })
 
         window.localStorage.setItem(
           'cart',
-          JSON.stringify( cartInfo ),
+          JSON.stringify(cartInfo),
         )
       } else {
-        let exist = cartInfo.filter(item => item.index === index )
+        let exist = cartInfo.filter(item => item.index === index)
         if (exist.length === 0) {
           cartInfo.push({
             index: index,
@@ -108,10 +108,10 @@ function CarouselItem({ currentEvent, item, index }) {
             price: item.price,
             qty: 0
           })
-  
+
           window.localStorage.setItem(
             'cart',
-            JSON.stringify( cartInfo ),
+            JSON.stringify(cartInfo),
           )
         }
       }
@@ -157,14 +157,21 @@ function CarouselItem({ currentEvent, item, index }) {
               </Typography>
             </Stack>
             <Paper
-              sx={{ backgroundColor: 'common.white', py: 3, height: 110 }}
-            ></Paper>
+              sx={{ backgroundColor: 'common.white', py: 2, height: 110 }}
+            >
+              {/* <Typography align="center" color="common.black" fontSize={18}>
+                Total entries:{' '}
+                <Typography variant="h4" component="span" color="primary">
+                  {item.entries}
+                </Typography>
+              </Typography> */}
+            </Paper>
             <Button
               variant="contained"
               color="success"
               sx={{ color: 'common.white', textTransform: 'uppercase' }}
               size="large"
-              onClick={() => register( index, item)}
+              onClick={() => register(index, item)}
             >
               Register Now
             </Button>
@@ -198,12 +205,6 @@ function CarouselItem({ currentEvent, item, index }) {
                 Total entries:{' '}
                 <Typography variant="h4" component="span" color="primary">
                   {item.entries}
-                </Typography>
-              </Typography>
-              <Typography fontSize={18} align="center" color="common.black">
-                Total Winners:{' '}
-                <Typography variant="h4" component="span" color="primary">
-                  {item.winners}
                 </Typography>
               </Typography>
             </Paper>
@@ -261,7 +262,7 @@ export default function EventsCarousel({ current_event }) {
   useEffect(() => {
     const tempEvents = []
     if (current_event) {
-      tempEvents.push( current_event.main )
+      tempEvents.push(current_event.main)
       current_event.satellite.map((item, index) => {
         tempEvents.push(item)
       })

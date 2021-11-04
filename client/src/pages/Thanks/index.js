@@ -136,8 +136,8 @@ export default function Thanks() {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {cart.map((row) => (
-                        <TableRow key={row.desc}>
+                      {cart.map((row, index) => (
+                        <TableRow key={index}>
                           <TableCell align="left" colSpan={3} sx={{color: 'black'}}>{row.index === 0 ? "Main Event" : `Satellite${row.index}`}</TableCell>
                           <TableCell align="left" colSpan={2} sx={{color: 'black'}}>{ccyFormat(row.price * row.qty)}</TableCell>
                         </TableRow>
