@@ -7,7 +7,6 @@ const TableSchema = new Schema(
     table: {
       type: Number,
       require: true,
-      unique: true,
     },
     day: {
       type: Schema.ObjectId,

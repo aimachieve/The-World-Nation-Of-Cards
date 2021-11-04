@@ -12,6 +12,10 @@ const MainTicketSchema = new Schema(
       type: Schema.ObjectId,
       ref: 'events',
     },
+    satelliteId: {
+      type: Schema.ObjectId,
+      ref: 'satellitetickets',
+    },
     username: {
       type: String,
       require: true,

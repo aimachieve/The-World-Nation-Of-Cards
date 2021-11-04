@@ -18,6 +18,22 @@ const EventSchema = new Schema(
         default: 0
       }
     },
+    status: {
+      type: Number,
+      default: 0
+      // 0: Started New Event -> After created new Event! Disable "New Event" button
+      // 1: Ended salesment and assignment -> click: "Draw" button (Main Event), Disable: product page(purchase button)
+      // 2: Ended Event -> Click: "End" button, "Final Draw" button, Enable: "New Event" Button
+      // 3: xxx
+    },
+    entry: {
+      type: Number,
+      default: 0,
+    },
+    winner: {
+      type: Number,
+      default: 0,
+    },
     satellite: [
       {
         price: {
@@ -35,17 +51,13 @@ const EventSchema = new Schema(
         date: {
           type: Date,
           default: Date.now 
+        },
+        status: {
+          type: Boolean,
+          default: true
         }
       },
-    ],
-    status: {
-      type: Number,
-      // 0: Started New Event -> After created new Event! Disable "New Event" button
-      // 1: Ended salesment and assignment -> click: "Draw" button (Main Event), Disable: product page(purchase button)
-      // 2: Ended Event -> Click: "End" button, "Final Draw" button, Enable: "New Event" Button
-      // 3: xxx
-      default: 0
-    }
+    ]
   },
   {
     timestamps: true

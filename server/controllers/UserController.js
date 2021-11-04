@@ -58,6 +58,7 @@ exports.register = (req, res) => {
                 province: user.province,
                 postalcode: user.postalcode,
                 phone: user.phone,
+                role: user.role,
               }
               console.log('successfully register!!!')
               jwt.sign(
@@ -121,6 +122,7 @@ exports.login = (req, res) => {
           province: user.province,
           postalcode: user.postalcode,
           phone: user.phone,
+          role: user.role,
         }
         console.log('successfully login!!!')
         // Sign token
@@ -164,6 +166,7 @@ exports.verifyEmail = (req, res) => {
               province: user.province,
               postalcode: user.postalcode,
               phone: user.phone,
+              role: user.role,
             }
             jwt.sign(
               payload,
@@ -215,7 +218,8 @@ exports.updateProfile = (req, res) => {
                     town: user.town,
                     province: user.province,
                     postalcode: user.postalcode,
-                    phone: user.phone
+                    phone: user.phone,
+                    role: user.role,
                   }
 
                   res.json({user: payload})
@@ -241,7 +245,8 @@ exports.updateProfile = (req, res) => {
         town: user.town,
         province: user.province,
         postalcode: user.postalcode,
-        phone: user.phone
+        phone: user.phone,
+        role: user.role,
       }
 
       res.json({user: payload})

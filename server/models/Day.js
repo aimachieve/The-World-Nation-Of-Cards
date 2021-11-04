@@ -6,7 +6,7 @@ const DaySchema = new Schema(
   {
     daynumber: {
       type: Number,
-      required: 0
+      default: 0
     },
     status: {
       type: Boolean,
@@ -21,7 +21,15 @@ const DaySchema = new Schema(
         type: Schema.ObjectId,
         ref: 'rooms'
       }
-    ]
+    ],
+    entry: {
+      type: Number,
+      default: 0
+    },
+    winner: {
+      type: Number,
+      default: 0
+    }
   },
   {
     timestamps: true

@@ -8,18 +8,26 @@ const SatelliteTicketSchema = new Schema(
       type: Schema.ObjectId,
       ref: 'users'
     },
-    event: {
+    eventId: {
       type: Schema.ObjectId,
-      ref: 'events',
+      ref: 'events'
+    },
+    satelliteId: {
+      type: Schema.ObjectId,
+    },
+    username: {
+      type: String,
+      require: true,
     },
     status: {
       type: Boolean,
-      default: true
-    }
+      default: false
+    },
+    eventId: {
+      type: String,
+      require: true
+    },
   },
-  {
-    timestamps: true
-  }
-);
+)
 
-module.exports = SatelliteTicket = mongoose.model("satellitetickets", SatelliteTicketSchema);
+module.exports = SatelliteTicket = mongoose.model('satellitetickets', SatelliteTicketSchema)
