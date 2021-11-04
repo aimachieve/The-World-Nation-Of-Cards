@@ -196,60 +196,148 @@ exports.verifyEmail = (req, res) => {
 }
 
 exports.updateProfile = (req, res) => {
-  const { firstname, lastname, email, password, newpassword1, username, phone, id } = req.body;
-  User.findOne({ _id: id }).then(async user => {
-    if(password !== "") {
+  let avatar = req.file ? req.file.filename : ''
+  const {
+    firstname,
+    lastname,
+    email,
+    password,
+    newpassword1,
+    username,
+    phone,
+    id,
+  } = req.body
+  User.findOne({ _id: id }).then(async (user) => {
+    if (password !== '') {
       User.findOne({ _id: id }).then((user) => {
         bcrypt.compare(password, user.password).then((isMatch) => {
           if (isMatch) {
             bcrypt.genSalt(10, (err, salt) => {
               bcrypt.hash(newpassword1, salt, (err, hash) => {
-                if (err) throw err;
+                if (err) throw err
 
-                User.findOneAndUpdate({ _id: id }, {$set: {
-                  name: firstname+' '+lastname, email, username, phone, password: hash
-                } }).then((user) => {
-                  const payload = {
-                    id: user._id,
-                    name: user.name,
-                    email: user.email,
-                    username: user.username,
-                    address: user.address,
-                    town: user.town,
-                    province: user.province,
-                    postalcode: user.postalcode,
-                    phone: user.phone,
-                    role: user.role,
-                  }
+                if (avatar) {
+                  User.findOneAndUpdate(
+                    { _id: id },
+                    {
+                      $set: {
+                        name: firstname + ' ' + lastname,
+                        email,
+                        username,
+                        phone,
+                        password: hash,
+                        avatar: avatar,
+                      },
+                    },
+                  ).then((user) => {
+                    const payload = {
+                      id: user._id,
+                      name: user.name,
+                      email: user.email,
+                      username: user.username,
+                      address: user.address,
+                      town: user.town,
+                      province: user.province,
+                      postalcode: user.postalcode,
+                      phone: user.phone,
+                      avatar: user.avatar,
+                    }
 
-                  res.json({user: payload})
-                })
-              });
-            });
+                    return res.json({ user: payload })
+                  })
+                } else {
+                  User.findOneAndUpdate(
+                    { _id: id },
+                    {
+                      $set: {
+                        name: firstname + ' ' + lastname,
+                        email,
+                        username,
+                        phone,
+                        password: hash,
+                      },
+                    },
+                  ).then((user) => {
+                    const payload = {
+                      id: user._id,
+                      name: user.name,
+                      email: user.email,
+                      username: user.username,
+                      address: user.address,
+                      town: user.town,
+                      province: user.province,
+                      postalcode: user.postalcode,
+                      phone: user.phone,
+                      avatar: user.avatar,
+                    }
+
+                    return res.json({ user: payload })
+                  })
+                }
+              })
+            })
           } else {
-            return res.status(400).json({ error: "Password incorrect" });
+            return res.status(400).json({ error: 'Password incorrect' })
           }
         })
       })
     }
 
-    User.findOneAndUpdate({ _id: id }, {$set: {
-      name: firstname+' '+lastname, email, username, phone
-    } }).then((user) => {
-      const payload = {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        username: user.username,
-        address: user.address,
-        town: user.town,
-        province: user.province,
-        postalcode: user.postalcode,
-        phone: user.phone,
-        role: user.role,
-      }
+    if (avatar) {
+      User.findOneAndUpdate(
+        { _id: id },
+        {
+          $set: {
+            name: firstname + ' ' + lastname,
+            email,
+            username,
+            phone,
+            avatar: avatar,
+          },
+        },
+      ).then((user) => {
+        const payload = {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          username: user.username,
+          address: user.address,
+          town: user.town,
+          province: user.province,
+          postalcode: user.postalcode,
+          phone: user.phone,
+          avatar: user.avatar,
+        }
 
-      res.json({user: payload})
-    })
+        return res.json({ user: payload })
+      })
+    } else {
+      User.findOneAndUpdate(
+        { _id: id },
+        {
+          $set: {
+            name: firstname + ' ' + lastname,
+            email,
+            username,
+            phone,
+          },
+        },
+      ).then((user) => {
+        const payload = {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          username: user.username,
+          address: user.address,
+          town: user.town,
+          province: user.province,
+          postalcode: user.postalcode,
+          phone: user.phone,
+          avatar: user.avatar,
+        }
+
+        return res.json({ user: payload })
+      })
+    }
   })
 }

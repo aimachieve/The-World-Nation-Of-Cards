@@ -33,6 +33,9 @@ app.use(passport.initialize())
 // Passport config
 require('./config/passport')(passport)
 
+//  Define the route to read the files of the server from the client
+app.use('/uploads/', express.static('uploads'))
+
 // Routes
 app.use('/api/account', users)
 app.use('/api/draw', draw)

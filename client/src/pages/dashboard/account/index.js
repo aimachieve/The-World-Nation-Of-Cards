@@ -1,17 +1,32 @@
 /* eslint-disable */
 // material
-import React, {useState, useEffect} from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { styled } from '@material-ui/core/styles'
 // components
 import Page from '../../../components/Page'
 
-import { Container, Typography, Grid, Tabs, Tab, Box, List, ListItem, ListItemText, ListItemButton, TextField, Stack } from '@material-ui/core'
+import {
+  Container,
+  Typography,
+  Grid,
+  Tabs,
+  Tab,
+  Box,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemButton,
+  TextField,
+  Stack,
+} from '@material-ui/core'
 
-import { LoadingButton } from '@material-ui/lab';
-import useAuth from "hooks/useAuth";
+import { LoadingButton } from '@material-ui/lab'
+import useAuth from 'hooks/useAuth'
+import UploadAvatar from 'customComponents/UploadAvatar'
+import { fData } from 'utils/formatNumber'
 
 const RootStyle = styled(Page)({
-  paddingTop: 120,
+  paddingTop: 176,
   paddingBottom: 88,
   height: '100%',
 })
@@ -23,58 +38,88 @@ const ContentStyle = styled('div')(({ theme }) => ({
 }))
 
 export default function Account() {
-  const { logout, updateProfile } = useAuth();
+  const { logout, updateProfile } = useAuth()
 
-  const [id, setID] = useState("");
-  const [phone, setPhone] = useState("");
-  const [firstname, setFirstname] = useState("");
-  const [lastname, setLastname] = useState("");
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [newpassword1, setNewpassword1] = useState("");
-  const [newpassword2, setNewpassword2] = useState("");
+  const [id, setID] = useState('')
+  const [phone, setPhone] = useState('')
+  const [firstname, setFirstname] = useState('')
+  const [lastname, setLastname] = useState('')
+  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [newpassword1, setNewpassword1] = useState('')
+  const [newpassword2, setNewpassword2] = useState('')
+  const [avatar, setAvatar] = useState(null)
 
   useEffect(() => {
-    let user = localStorage.getItem('user');
-    user = JSON.parse(user);
-    setID(user._id);
-    setPhone(user.phone);
-    setFirstname(user.name.split(' ')[0]);
-    setLastname(user.name.split(' ')[1]);
-    setUsername(user.username);
-    setEmail(user.email);
+    let user = localStorage.getItem('user')
+    user = JSON.parse(user)
+    setID(user._id)
+    setPhone(user.phone)
+    setFirstname(user.name.split(' ')[0])
+    setLastname(user.name.split(' ')[1])
+    setUsername(user.username)
+    setEmail(user.email)
+    if (user.avatar) {
+      setAvatar(
+        `http://${window.location.hostname}:5000/uploads/${user.avatar}`,
+      )
+    }
   }, [])
 
   const updateUser = () => {
-    if(newpassword1 !== newpassword2) {
-      window.alert("please enter your new password");
-      return;
+    if (newpassword1 !== newpassword2) {
+      window.alert('please enter your new password')
+      return
     }
-
-    updateProfile({
-      id,
-      phone,
-      firstname,
-      lastname,
-      username,
-      email,
-      password,
-      newpassword1
-    })
+    let formData = new FormData()
+    formData.append('id', id)
+    formData.append('phone', phone)
+    formData.append('firstname', firstname)
+    formData.append('lastname', lastname)
+    formData.append('username', username)
+    formData.append('email', email)
+    formData.append('password', password)
+    formData.append('newpassword1', newpassword1)
+    if (avatar instanceof Object) {
+      formData.append('avatar', avatar.file)
+    }
+    updateProfile(formData)
   }
+
+  const handleDrop = useCallback((acceptedFiles) => {
+    const file = acceptedFiles[0]
+    if (file) {
+      setAvatar({
+        file,
+        preview: URL.createObjectURL(file),
+      })
+      console.log(avatar)
+    }
+  })
 
   return (
     <RootStyle>
       <ContentStyle>
         <Container>
-          <Typography variant="h3" component="h1" paragraph sx={{textAlign: 'center', mt: 3}}>
+          <Typography
+            variant="h3"
+            component="h1"
+            paragraph
+            sx={{ textAlign: 'center', mt: 3 }}
+          >
             My Account
           </Typography>
 
           <Grid container>
             <Grid item xs={12} md={3}>
-              <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+              <List
+                sx={{
+                  width: '100%',
+                  maxWidth: 360,
+                  bgcolor: 'background.paper',
+                }}
+              >
                 <ListItem>
                   <ListItemButton component="a" href="/dashboard">
                     Dashboard
@@ -100,101 +145,129 @@ export default function Account() {
                 </ListItem>
 
                 <ListItem>
-                  <ListItemButton onClick={logout}>
-                    Logout
-                  </ListItemButton>
+                  <ListItemButton onClick={logout}>Logout</ListItemButton>
                 </ListItem>
               </List>
             </Grid>
             <Grid item xs={12} md={9}>
-              <Grid container sx={{padding: '0 20px'}}>
-                <Grid item xs={12} sx={{mb: 2}}>
-                  <Grid container sx={{padding: '0 20px'}}>
-                    <Typography variant="h5" sx={{margin: 0, fontWeight: '300'}}>
+              <Grid container sx={{ padding: '0 20px' }}>
+                <Grid item xs={12} sx={{ mb: 2 }}>
+                  <Grid container sx={{ padding: '0 20px' }}>
+                    <Stack direction="row" justifyContent="center">
+                      <UploadAvatar
+                        accept="image/*"
+                        maxSize={3145728}
+                        file={avatar}
+                        onDrop={handleDrop}
+                      />
+                    </Stack>
+                  </Grid>
+                </Grid>
+                <Grid item xs={12} sx={{ mb: 2 }}>
+                  <Grid container sx={{ padding: '0 20px' }}>
+                    <Typography
+                      variant="h5"
+                      sx={{ margin: 0, fontWeight: '300' }}
+                    >
                       Mobile Number
                     </Typography>
                     <TextField
                       fullWidth
                       autoComplete="mobilenumber"
                       label="Enter your mobile number"
-                      sx={{marginTop: '10px !important'}}
+                      sx={{ marginTop: '10px !important' }}
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                     />
                   </Grid>
                 </Grid>
 
-                <Grid item xs={12} md={6} sx={{mb: 2}}>
-                  <Grid container sx={{padding: '0 20px'}}>
-                    <Typography variant="h5" sx={{margin: 0, fontWeight: '300'}}>
-                      First Name <span style={{color: '#364e9b'}}>*</span>
+                <Grid item xs={12} md={6} sx={{ mb: 2 }}>
+                  <Grid container sx={{ padding: '0 20px' }}>
+                    <Typography
+                      variant="h5"
+                      sx={{ margin: 0, fontWeight: '300' }}
+                    >
+                      First Name <span style={{ color: '#364e9b' }}>*</span>
                     </Typography>
                     <TextField
                       fullWidth
                       autoComplete="firstname"
                       label="Enter your first name"
-                      sx={{marginTop: '10px !important'}}
+                      sx={{ marginTop: '10px !important' }}
                       value={firstname}
                       onChange={(e) => setFirstname(e.target.value)}
                     />
                   </Grid>
                 </Grid>
 
-                <Grid item xs={12} md={6} sx={{mb: 2}}>
-                  <Grid container sx={{padding: '0 20px'}}>
-                    <Typography variant="h5" sx={{margin: 0, fontWeight: '300'}}>
-                      Last Name <span style={{color: '#364e9b'}}>*</span>
+                <Grid item xs={12} md={6} sx={{ mb: 2 }}>
+                  <Grid container sx={{ padding: '0 20px' }}>
+                    <Typography
+                      variant="h5"
+                      sx={{ margin: 0, fontWeight: '300' }}
+                    >
+                      Last Name <span style={{ color: '#364e9b' }}>*</span>
                     </Typography>
                     <TextField
                       fullWidth
                       autoComplete="lastname"
                       label="Enter your lastname"
-                      sx={{marginTop: '10px !important'}}
+                      sx={{ marginTop: '10px !important' }}
                       value={lastname}
                       onChange={(e) => setLastname(e.target.value)}
                     />
                   </Grid>
                 </Grid>
 
-                <Grid item xs={12} sx={{mb: 2}}>
-                  <Grid container sx={{padding: '0 20px'}}>
-                    <Typography variant="h5" sx={{margin: 0, fontWeight: '300'}}>
-                      Display Name <span style={{color: '#364e9b'}}>*</span>
+                <Grid item xs={12} sx={{ mb: 2 }}>
+                  <Grid container sx={{ padding: '0 20px' }}>
+                    <Typography
+                      variant="h5"
+                      sx={{ margin: 0, fontWeight: '300' }}
+                    >
+                      Display Name <span style={{ color: '#364e9b' }}>*</span>
                     </Typography>
                     <TextField
                       fullWidth
                       autoComplete="displayname"
                       label="Enter your display name"
-                      sx={{marginTop: '10px !important'}}
+                      sx={{ marginTop: '10px !important' }}
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                     />
                   </Grid>
                 </Grid>
 
-                <Grid item xs={12} sx={{mb: 2}}>
-                  <Grid container sx={{padding: '0 20px'}}>
-                    <Typography variant="h5" sx={{margin: 0, fontWeight: '300'}}>
-                      Email Address <span style={{color: '#364e9b'}}>*</span>
+                <Grid item xs={12} sx={{ mb: 2 }}>
+                  <Grid container sx={{ padding: '0 20px' }}>
+                    <Typography
+                      variant="h5"
+                      sx={{ margin: 0, fontWeight: '300' }}
+                    >
+                      Email Address <span style={{ color: '#364e9b' }}>*</span>
                     </Typography>
                     <TextField
                       fullWidth
                       autoComplete="email"
                       label="Enter your email address"
-                      sx={{marginTop: '10px !important'}}
+                      sx={{ marginTop: '10px !important' }}
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                     />
-                    <Typography variant="h4" sx={{mt: 3, fontWeight: '300'}}>
+                    <Typography variant="h4" sx={{ mt: 3, fontWeight: '300' }}>
                       Password Change
                     </Typography>
                   </Grid>
                 </Grid>
 
-                <Grid item xs={12} sx={{mb: 2}}>
-                  <Grid container sx={{padding: '0 20px'}}>
-                    <Typography variant="h5" sx={{margin: 0, fontWeight: '300'}}>
+                <Grid item xs={12} sx={{ mb: 2 }}>
+                  <Grid container sx={{ padding: '0 20px' }}>
+                    <Typography
+                      variant="h5"
+                      sx={{ margin: 0, fontWeight: '300' }}
+                    >
                       Current Password (leave blank to leave unchanged)
                     </Typography>
                     <TextField
@@ -202,16 +275,19 @@ export default function Account() {
                       autoComplete="password"
                       label="Enter your current password"
                       type="password"
-                      sx={{marginTop: '10px !important'}}
+                      sx={{ marginTop: '10px !important' }}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                     />
                   </Grid>
                 </Grid>
 
-                <Grid item xs={12} sx={{mb: 2}}>
-                  <Grid container sx={{padding: '0 20px'}}>
-                    <Typography variant="h5" sx={{margin: 0, fontWeight: '300'}}>
+                <Grid item xs={12} sx={{ mb: 2 }}>
+                  <Grid container sx={{ padding: '0 20px' }}>
+                    <Typography
+                      variant="h5"
+                      sx={{ margin: 0, fontWeight: '300' }}
+                    >
                       New Password (leave blank to leave unchanged)
                     </Typography>
                     <TextField
@@ -219,16 +295,19 @@ export default function Account() {
                       autoComplete="newpassword"
                       label="Enter your new password"
                       type="password"
-                      sx={{marginTop: '10px !important'}}
+                      sx={{ marginTop: '10px !important' }}
                       value={newpassword1}
                       onChange={(e) => setNewpassword1(e.target.value)}
                     />
                   </Grid>
                 </Grid>
 
-                <Grid item xs={12} sx={{mb: 2}}>
-                  <Grid container sx={{padding: '0 20px'}}>
-                    <Typography variant="h5" sx={{margin: 0, fontWeight: '300'}}>
+                <Grid item xs={12} sx={{ mb: 2 }}>
+                  <Grid container sx={{ padding: '0 20px' }}>
+                    <Typography
+                      variant="h5"
+                      sx={{ margin: 0, fontWeight: '300' }}
+                    >
                       Confirm new Password
                     </Typography>
                     <TextField
@@ -236,12 +315,22 @@ export default function Account() {
                       autoComplete="confirmpassword"
                       type="password"
                       label="Confirm your password"
-                      sx={{marginTop: '10px !important'}}
+                      sx={{ marginTop: '10px !important' }}
                       value={newpassword2}
                       onChange={(e) => setNewpassword2(e.target.value)}
                     />
 
-                    <LoadingButton size="large" type="submit" variant="contained" sx={{ backgroundColor: '#2fc557', boxShadow: 'none', mt: 3 }} onClick={updateUser}>
+                    <LoadingButton
+                      size="large"
+                      type="submit"
+                      variant="contained"
+                      sx={{
+                        backgroundColor: '#2fc557',
+                        boxShadow: 'none',
+                        mt: 3,
+                      }}
+                      onClick={updateUser}
+                    >
                       Save Change
                     </LoadingButton>
                   </Grid>
