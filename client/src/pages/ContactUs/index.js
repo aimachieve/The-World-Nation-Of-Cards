@@ -1,25 +1,32 @@
 /* eslint-disable */
-import React from 'react'
+import React, { useState } from 'react'
 import { styled } from '@material-ui/core/styles'
-import { Box, Grid, Container, Typography, Button, TextField } from '@material-ui/core';
+import {
+  Box,
+  Grid,
+  Container,
+  Typography,
+  Button,
+  TextField,
+} from '@material-ui/core'
 
-import { MotionInView, varFadeInUp } from '../../components/animate';
+import { MotionInView, varFadeInUp } from '../../components/animate'
 
-import Banner from 'customComponents/Banner';
-import SignUpCTA from 'customComponents/SignUpCTA';
+import Banner from 'customComponents/Banner'
+import SignUpCTA from 'customComponents/SignUpCTA'
 
 const RootStyle = styled('div')(({ theme }) => ({
   width: '100%',
   background: 'url(/images/site-background.jpg)',
   backgroundSize: 'cover',
   display: 'flex',
-  alignItems: 'center'
+  alignItems: 'center',
 }))
 
 const ContentStyle = styled('div')(({ theme }) => ({
   position: 'relative',
   overflow: 'hidden',
-  textAlign: 'center'
+  textAlign: 'center',
 }))
 
 const MainStyle = styled('div')(({ theme }) => ({
@@ -29,19 +36,44 @@ const MainStyle = styled('div')(({ theme }) => ({
   margin: theme.spacing(3, 0),
 }))
 
-
 export default function ContactUs() {
+  const [messageData, setMessageData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    subject: '',
+    message: '',
+  })
+  const [adminEmail, setAdminEmail] = useState('mr.new0509@gmail.com')
+
+  const onChange = (e) => {
+    const { name, value } = e.target
+    setMessageData({
+      ...messageData,
+      [name]: value,
+    })
+  }
+
+  const onSubmit = () => {}
+
   return (
     <RootStyle>
       <ContentStyle>
-      {/* Banner */}
-      <Banner />
+        {/* Banner */}
+        <Banner />
 
-      {/* Drop a message */}
+        {/* Drop a message */}
         <Container maxWidth="lg">
           <MainStyle>
             <MotionInView variants={varFadeInUp}>
-              <Typography sx={{ mt: 3, mb: 3, fontFamily: 'Arciform,AdobeInvisFont,MyriadPro-Regular', fontSize: '20px' }}>
+              <Typography
+                sx={{
+                  mt: 3,
+                  mb: 3,
+                  fontFamily: 'Arciform,AdobeInvisFont,MyriadPro-Regular',
+                  fontSize: '20px',
+                }}
+              >
                 DROP US A MESSAGE
               </Typography>
             </MotionInView>
@@ -53,57 +85,109 @@ export default function ContactUs() {
                     fullWidth
                     autoComplete="first_name"
                     label="First Name"
-                    sx={{mt: 3}}
+                    sx={{ mt: 3 }}
+                    name="firstName"
+                    value={messageData.firstName}
+                    onChange={(e) => onChange(e)}
                   />
                   <TextField
                     fullWidth
                     autoComplete="last_name"
                     label="Last Name"
-                    sx={{mt: 3}}
+                    sx={{ mt: 3 }}
+                    name="lastName"
+                    value={messageData.lastName}
+                    onChange={(e) => onChange(e)}
                   />
                   <TextField
                     fullWidth
                     autoComplete="email"
                     type="email"
                     label="Email"
-                    sx={{mt: 3}}
+                    sx={{ mt: 3 }}
+                    name="email"
+                    value={messageData.email}
+                    onChange={(e) => onChange(e)}
                   />
                   <TextField
                     fullWidth
                     autoComplete="subject"
                     label="Subject"
-                    sx={{mt: 3}}
+                    sx={{ mt: 3 }}
+                    name="subject"
+                    value={messageData.subject}
+                    onChange={(e) => onChange(e)}
                   />
                   <TextField
                     fullWidth
                     multiline
                     autoComplete="message"
-                    minRows='5'
+                    minRows="5"
                     label="Message"
-                    sx={{mt: 3}}
+                    sx={{ mt: 3 }}
+                    name="message"
+                    value={messageData.message}
+                    onChange={(e) => onChange(e)}
                   />
-                  <Button varient="contained" sx={{ backgroundColor: '#2FC656', color: '#fff', mt: 3, width: '30px',textAlign: 'left',
-                   '&:hover': { backgroundColor: '#29B2FE', color: '#fff' } }}> SUBMIT </Button>
+                  <Button
+                    varient="contained"
+                    sx={{
+                      backgroundColor: '#2FC656',
+                      color: '#fff',
+                      mt: 3,
+                      width: '30px',
+                      textAlign: 'left',
+                      '&:hover': { backgroundColor: '#29B2FE', color: '#fff' },
+                    }}
+                    onClick={() => onSubmit()}
+                  >
+                    SUBMIT
+                  </Button>
                 </MotionInView>
               </Grid>
               <Grid item xs={12} md={6}>
-                <img src='/images/contact_phone.png' alt="contact_phone" style={{margin: 'auto', width: 50}} />
-                <Typography sx={{ mt: 2, mb: 3, fontFamily: 'Arciform,AdobeInvisFont,MyriadPro-Regular', fontSize: '5' }}>
+                <img
+                  src="/images/contact_phone.png"
+                  alt="contact_phone"
+                  style={{ margin: 'auto', width: 50 }}
+                />
+                <Typography
+                  sx={{
+                    mt: 2,
+                    mb: 3,
+                    // fontFamily: 'Arciform,AdobeInvisFont,MyriadPro-Regular',
+                    fontSize: '5',
+                  }}
+                >
                   1.800.555.5555
                 </Typography>
-                <img src='/images/contact_email.png' alt="contact_email" style={{margin: 'auto', width: 50}} />
-                <Typography sx={{ mt: 2, mb: 3, fontFamily: 'Arciform,AdobeInvisFont,MyriadPro-Regular', fontSize: '5' }}>
-                  johndoe@companyname.com
+                <img
+                  src="/images/contact_email.png"
+                  alt="contact_email"
+                  style={{ margin: 'auto', width: 50 }}
+                />
+                <Typography
+                  sx={{
+                    mt: 2,
+                    mb: 3,
+                    // fontFamily: 'Arciform,AdobeInvisFont,MyriadPro-Regular',
+                    fontSize: '5',
+                  }}
+                >
+                  {adminEmail}
                 </Typography>
-                <img src='/images/placeholder-portfolio-items.jpg' alt="placeholder-portfolio-items" style={{margin: 'auto', width: 400, marginBottom: '10px'}} />
+                <img
+                  src="/images/placeholder-portfolio-items.jpg"
+                  alt="placeholder-portfolio-items"
+                  style={{ margin: 'auto', width: 400, marginBottom: '10px' }}
+                />
               </Grid>
             </Grid>
           </MainStyle>
         </Container>
 
-      {/* Sign Up Now */}
-      <SignUpCTA />
-
+        {/* Sign Up Now */}
+        <SignUpCTA />
       </ContentStyle>
     </RootStyle>
   )

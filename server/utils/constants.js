@@ -1,1 +1,1 @@
-exports.UPLOADS_DIRECTORY = './uploads'
+exports.UPLOADS_DIRECTORY = './server/uploads'

@@ -13,7 +13,6 @@ const upload = multer({
     },
     filename(req, file, cb) {
       cb(null, `${new Date().getTime()}_${file.originalname}`)
-      // cb(null, file.originalname)
     },
   }),
   limits: {
