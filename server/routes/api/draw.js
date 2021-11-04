@@ -6,7 +6,7 @@ const DrawController = require('../../controllers/DrawController')
 // router.post("/register", DrawController.register);
 // router.post("/login", DrawController.login);
 // router.post("/verify-email", DrawController.verifyEmail);
-router.get("/products", DrawController.getProducts);
+router.get('/products', DrawController.getProducts)
 /*================ Mr.New ==============*/
 router.get('/createMockData', DrawController.createMockData)
 router.get('/getRandomTables', DrawController.getRandomTables)
@@ -30,25 +30,24 @@ router.put(
   DrawController.searchSatelliteUsersBySatelliteEventId,
 )
 router.get('/getEventById/:_id', DrawController.getEventById)
+router.post('/sendEmailToAdmin', DrawController.sendEmailToAdmin)
 /*======================================*/
-router.post("/payment", DrawController.payment);
-
+router.post('/payment', DrawController.payment)
 
 /*=====================Play Game=================*/
-router.post("/assignSatelliteTable", DrawController.assignSatelliteTable);
-router.get("/makeTable", DrawController.makeTable);
-router.get("/roomDraw/:id", DrawController.roomDraw);
-router.get("/endDay", DrawController.endDay);
-router.get("/finalRoom/:id", DrawController.finalRoom);
-router.get("/getFinalWinner", DrawController.getFinalWinner);
-
+router.post('/assignSatelliteTable', DrawController.assignSatelliteTable)
+router.get('/makeTable', DrawController.makeTable)
+router.get('/roomDraw/:id', DrawController.roomDraw)
+router.get('/endDay', DrawController.endDay)
+router.get('/finalRoom/:id', DrawController.finalRoom)
+router.get('/getFinalWinner', DrawController.getFinalWinner)
 
 /*=====================Admin Page=================*/
-router.get("/current_event", DrawController.getCurrentEvent);
-router.post("/create_event", DrawController.create_Event);
-router.post("/create_sEvent", DrawController.create_sEvent);
-router.post("/create_mEvent", DrawController.create_mEvent);
+router.get('/current_event', DrawController.getCurrentEvent)
+router.post('/create_event', DrawController.create_Event)
+router.post('/create_sEvent', DrawController.create_sEvent)
+router.post('/create_mEvent', DrawController.create_mEvent)
 
-router.get("/get_tickets", DrawController.get_tickets);
+router.get('/get_tickets', DrawController.get_tickets)
 
 module.exports = router

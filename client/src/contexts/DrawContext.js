@@ -14,7 +14,7 @@ const initialState = {
   expectedUsersAmount: 0,
   currentDay: 0,
   finalWinner: [],
-  loading: false
+  loading: false,
 }
 
 const handlers = {
@@ -47,7 +47,7 @@ const handlers = {
     return {
       ...state,
       tables,
-      currentDay
+      currentDay,
     }
   },
   SET_USERS: (state, action) => {
@@ -89,7 +89,7 @@ const handlers = {
       ...state,
       finalWinner: action.payload,
     }
-  }
+  },
 }
 
 const reducer = (state, action) =>
@@ -123,7 +123,8 @@ const DrawContext = createContext({
   roomDraw: () => Promise.resolve(),
   endDay: () => Promise.resolve(),
   finalRoom: () => Promise.resolve(),
-  getFinalWinner: () => Promise.resolve()
+  getFinalWinner: () => Promise.resolve(),
+  sendEmailToAdmin: () => Promise.resolve(),
 })
 
 function DrawProvider({ children }) {
@@ -137,46 +138,46 @@ function DrawProvider({ children }) {
 
   const set_loading = (data) => {
     dispatch({
-      type: "SET_LOADING",
+      type: 'SET_LOADING',
       payload: data,
-    });
+    })
   }
 
   // Create Events
-  
+
   const create_event = async (data) => {
-    const response = await axios.post("/api/draw/create_event", data);
-    
-    if(response.data == "OK") {
+    const response = await axios.post('/api/draw/create_event', data)
+
+    if (response.data == 'OK') {
       dispatch(getCurrentEvent())
       dispatch(getAllDays())
     }
-   };
- 
+  }
+
   const create_sEvent = async (data) => {
-    const response = await axios.post("/api/draw/create_sEvent", data);
-    const { current_event } = response.data;
+    const response = await axios.post('/api/draw/create_sEvent', data)
+    const { current_event } = response.data
 
     dispatch({
-      type: "SET_CURRENT_EVENT",
+      type: 'SET_CURRENT_EVENT',
       payload: {
         current_event,
       },
-    });
-  };
- 
+    })
+  }
+
   const create_mEvent = async (data) => {
-    const response = await axios.post("/api/draw/create_mEvent", data);
+    const response = await axios.post('/api/draw/create_mEvent', data)
 
-    const { current_event } = response.data;
+    const { current_event } = response.data
 
     dispatch({
-      type: "SET_CURRENT_EVENT",
+      type: 'SET_CURRENT_EVENT',
       payload: {
         current_event,
       },
-    });
-  };
+    })
+  }
 
   /**
    * Get 12 random tables
@@ -261,7 +262,7 @@ function DrawProvider({ children }) {
         type: 'SET_TABLES',
         payload: {
           tables: data,
-          currentDay: reqData.dayNum
+          currentDay: reqData.dayNum,
         },
       })
     }
@@ -305,107 +306,106 @@ function DrawProvider({ children }) {
   }
 
   const getCurrentEvent = async () => {
-    const response = await axios.get("/api/draw/current_event");
-    const { current_event } = response.data;
+    const response = await axios.get('/api/draw/current_event')
+    const { current_event } = response.data
     const firstData = current_event
-    
+
     dispatch({
-      type: "SET_CURRENT_EVENT",
+      type: 'SET_CURRENT_EVENT',
       payload: {
         current_event: firstData,
       },
-    });
+    })
   }
 
   // Play Game
 
   const assignSatelliteTable = async (id, roomNum) => {
-    const response = await axios.post("/api/draw/assignSatelliteTable", {
+    const response = await axios.post('/api/draw/assignSatelliteTable', {
       satelliteId: id,
-      roomnumber: roomNum
-    });
+      roomnumber: roomNum,
+    })
 
-    if(response.data == "OK"){
+    if (response.data == 'OK') {
       dispatch(getCurrentEvent())
     }
   }
 
   const makeTable = async () => {
     dispatch({
-      type: "SET_LOADING",
+      type: 'SET_LOADING',
       payload: true,
-    });
-    const response = await axios.get("/api/draw/makeTable");
+    })
+    const response = await axios.get('/api/draw/makeTable')
     dispatch({
-      type: "SET_LOADING",
+      type: 'SET_LOADING',
       payload: false,
-    });
+    })
 
-    if(response.data == "OK"){
+    if (response.data == 'OK') {
       dispatch(getAllDays())
       dispatch(getCurrentEvent())
-      
     }
   }
 
-  const roomDraw = async roomId => {
+  const roomDraw = async (roomId) => {
     dispatch({
-      type: "SET_LOADING",
+      type: 'SET_LOADING',
       payload: true,
-    });
-    const response = await axios.get("/api/draw/roomDraw/"+roomId);
+    })
+    const response = await axios.get('/api/draw/roomDraw/' + roomId)
     dispatch({
-      type: "SET_LOADING",
+      type: 'SET_LOADING',
       payload: false,
-    });
+    })
 
-    if(response.data == "OK"){
-      dispatch(getCurrentEvent())
-      dispatch(getAllDays())
-    }
-  }
-
-  const endDay = async roomId => {
-    dispatch({
-      type: "SET_LOADING",
-      payload: true,
-    });
-    const response = await axios.get("/api/draw/endDay/");
-    dispatch({
-      type: "SET_LOADING",
-      payload: false,
-    });
-
-    if(response.data == "OK"){
+    if (response.data == 'OK') {
       dispatch(getCurrentEvent())
       dispatch(getAllDays())
     }
   }
 
-  const finalRoom = async winner => {
+  const endDay = async (roomId) => {
     dispatch({
-      type: "SET_LOADING",
+      type: 'SET_LOADING',
       payload: true,
-    });
-    const response = await axios.get("/api/draw/finalRoom/"+winner);
+    })
+    const response = await axios.get('/api/draw/endDay/')
     dispatch({
-      type: "SET_LOADING",
+      type: 'SET_LOADING',
       payload: false,
-    });
-    window.alert("Event Finished");
-    if(response.data == "OK"){
+    })
+
+    if (response.data == 'OK') {
+      dispatch(getCurrentEvent())
+      dispatch(getAllDays())
+    }
+  }
+
+  const finalRoom = async (winner) => {
+    dispatch({
+      type: 'SET_LOADING',
+      payload: true,
+    })
+    const response = await axios.get('/api/draw/finalRoom/' + winner)
+    dispatch({
+      type: 'SET_LOADING',
+      payload: false,
+    })
+    window.alert('Event Finished')
+    if (response.data == 'OK') {
       dispatch(getCurrentEvent())
       dispatch(getAllDays())
     }
   }
 
   const getFinalWinner = async () => {
-    const response = await axios.get("/api/draw/getFinalWinner");
+    const response = await axios.get('/api/draw/getFinalWinner')
 
-    if(response.data){
+    if (response.data) {
       dispatch({
-        type: "SET_FINAL_WINNER",
-        payload: response.data
+        type: 'SET_FINAL_WINNER',
+        payload: response.data,
       })
     }
   }
@@ -475,6 +475,16 @@ function DrawProvider({ children }) {
     }
   }
 
+  /**
+   * Send user's email to the admin's email account
+   * @param {object} messageData
+   * @returns
+   */
+  const sendEmailToAdmin = async (messageData) => {
+    const response = await axios.post('/api/draw/sendEmailToAdmin', messageData)
+    return response
+  }
+
   return (
     <DrawContext.Provider
       value={{
@@ -499,7 +509,8 @@ function DrawProvider({ children }) {
         getRandomTablesByDayIdAndRoomNumber,
         endDay,
         finalRoom,
-        getFinalWinner
+        getFinalWinner,
+        sendEmailToAdmin,
       }}
     >
       {children}

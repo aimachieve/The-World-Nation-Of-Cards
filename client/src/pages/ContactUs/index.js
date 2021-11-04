@@ -2,18 +2,22 @@
 import React, { useState } from 'react'
 import { styled } from '@material-ui/core/styles'
 import {
-  Box,
   Grid,
   Container,
   Typography,
   Button,
   TextField,
 } from '@material-ui/core'
+import { useSnackbar } from 'notistack5'
+import { Icon } from '@iconify/react'
+import closeFill from '@iconify/icons-eva/close-fill'
 
 import { MotionInView, varFadeInUp } from '../../components/animate'
+import { MIconButton } from '../../components/@material-extend'
 
 import Banner from 'customComponents/Banner'
 import SignUpCTA from 'customComponents/SignUpCTA'
+import useDraw from 'hooks/useDraw'
 
 const RootStyle = styled('div')(({ theme }) => ({
   width: '100%',
@@ -37,6 +41,8 @@ const MainStyle = styled('div')(({ theme }) => ({
 }))
 
 export default function ContactUs() {
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar()
+  const { sendEmailToAdmin } = useDraw()
   const [messageData, setMessageData] = useState({
     firstName: '',
     lastName: '',
@@ -54,7 +60,21 @@ export default function ContactUs() {
     })
   }
 
-  const onSubmit = () => {}
+  const onSubmit = async () => {
+    const response = await sendEmailToAdmin(messageData)
+    console.log(response)
+    const { status } = response
+    if (status === 200) {
+      enqueueSnackbar('Message submit success!', {
+        variant: 'success',
+        action: (key) => (
+          <MIconButton size="small" onClick={() => closeSnackbar(key)}>
+            <Icon icon={closeFill} />
+          </MIconButton>
+        ),
+      })
+    }
+  }
 
   return (
     <RootStyle>

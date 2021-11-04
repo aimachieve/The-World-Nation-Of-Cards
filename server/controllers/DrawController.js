@@ -1,11 +1,10 @@
 const mongoose = require('mongoose')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const keys = require('../config/keys')
-
+const nodemailer = require('nodemailer')
 var request = require('request')
 var qs = require('querystring')
-
+const keys = require('../config/keys')
 const { otplibAuthenticator } = require('../config/otplib')
 const { mailgunHelper } = require('../config/mailgun')
 
@@ -18,7 +17,34 @@ const Day = require('../models/Day')
 const Room = require('../models/Room')
 
 let otp
-let roomnames = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+let roomnames = [
+  'A',
+  'B',
+  'C',
+  'D',
+  'E',
+  'F',
+  'G',
+  'H',
+  'I',
+  'J',
+  'K',
+  'L',
+  'M',
+  'N',
+  'O',
+  'P',
+  'Q',
+  'R',
+  'S',
+  'T',
+  'U',
+  'V',
+  'W',
+  'X',
+  'Y',
+  'Z',
+]
 
 exports.getProducts = (req, res) => {
   Event.findOne().then((event) => {
@@ -159,10 +185,10 @@ exports.getAllUsers = async (req, res) => {
  * @param {object} res
  */
 exports.getAllDays = async (req, res) => {
-  let event = await Event.findOne({status: {$lt : 3}});
+  let event = await Event.findOne({ status: { $lt: 3 } })
 
-  if(event){
-    Day.find({event_id: event._id})
+  if (event) {
+    Day.find({ event_id: event._id })
       .populate('room')
       .then((data) => {
         return res.status(200).json(data)
@@ -273,10 +299,10 @@ exports.searchSatelliteUsersBySatelliteEventId = (req, res) => {
 /**
  * Get satellite events by the main event id
  * @param {object} req
- * @param {object} 
+ * @param {object}
  */
 exports.getEventById = (req, res) => {
-  Event.findOne({ status: {$lt: 3} })
+  Event.findOne({ status: { $lt: 3 } })
     .then((result) => {
       console.log(result)
       return res.status(200).json(result)
@@ -303,7 +329,10 @@ exports.getRandomTablesByDayIdAndRoomNumber = async (req, res) => {
     {
       $match: {
         day: mongoose.Types.ObjectId(dayId),
-        table: {$lt : (Number(roomnumber) + 1)*2000 + 1, $gt : Number(roomnumber)*2000}
+        table: {
+          $lt: (Number(roomnumber) + 1) * 2000 + 1,
+          $gt: Number(roomnumber) * 2000,
+        },
         // 'seat.history': {
         //   $elemMatch: {
         //     room: roomnumber,
@@ -323,117 +352,138 @@ exports.getRandomTablesByDayIdAndRoomNumber = async (req, res) => {
   return res.status(200).json(resTables)
 }
 
+/**
+ * Send email to the administrator's email account
+ * @param {object} req
+ * @param {object} res
+ * @returns
+ */
+exports.sendEmailToAdmin = (req, res) => {
+  const { firstName, lastName, email, subject, message } = req.body
+  return res.status(200).send('OK')
+}
+
 /*========================= Admin page =============================*/
 // Create New Evnet
 exports.create_Event = async (req, res) => {
-  let event = await Event.findOne({status: {$lt : 3}});
+  let event = await Event.findOne({ status: { $lt: 3 } })
 
-  if(event) {
-    event.status = 3;
-    var entryCount = await MainTicket.find({event: event._id}).count();
-    var winnerCount = await MainTicket.find({event: event._id, status: true}).count();
+  if (event) {
+    event.status = 3
+    var entryCount = await MainTicket.find({ event: event._id }).count()
+    var winnerCount = await MainTicket.find({
+      event: event._id,
+      status: true,
+    }).count()
 
-    event.entry = entryCount;
-    event.winner = winnerCount;
+    event.entry = entryCount
+    event.winner = winnerCount
 
-    await event.save();
+    await event.save()
   }
 
   const newEvent = new Event({
     name: req.body.eventName,
-    status: 0
-  });
+    status: 0,
+  })
 
-  await MainTicket.deleteMany();
-  await SatelliteTicket.deleteMany();
+  await MainTicket.deleteMany()
+  await SatelliteTicket.deleteMany()
 
   newEvent
     .save()
     .then((event) => {
-      res.json("OK");
+      res.json('OK')
     })
-    .catch((err) => console.log(err));
-};
+    .catch((err) => console.log(err))
+}
 
 // Create Satellite Event
 exports.create_sEvent = async (req, res) => {
-  const current_event = await Event.findById(req.body.id);
-  const current_satellite = current_event.satellite;
+  const current_event = await Event.findById(req.body.id)
+  const current_satellite = current_event.satellite
   current_satellite.push({
-      price: req.body.price,
-      entries: req.body.entries,
-      winners: req.body.winners,
-      date: req.body.date
+    price: req.body.price,
+    entries: req.body.entries,
+    winners: req.body.winners,
+    date: req.body.date,
   })
 
   await Event.findOneAndUpdate(
     { _id: req.body.id },
-    { $set: {'satellite': current_satellite } }
-  );
+    { $set: { satellite: current_satellite } },
+  )
 
-  const updated_event = await Event.findById(req.body.id);
+  const updated_event = await Event.findById(req.body.id)
 
   res.json({
     success: true,
-    current_event: updated_event
-  });
-};
+    current_event: updated_event,
+  })
+}
 
 // Create Main Event
 exports.create_mEvent = async (req, res) => {
-  const current_event = await Event.findById(req.body.id);
+  const current_event = await Event.findById(req.body.id)
 
   await Event.findOneAndUpdate(
     { _id: req.body.id },
-    { $set: {'main': {
-      price: req.body.price,
-      date: req.body.date
-    } } }
-  );
+    {
+      $set: {
+        main: {
+          price: req.body.price,
+          date: req.body.date,
+        },
+      },
+    },
+  )
 
-  const updated_event = await Event.findById(req.body.id);
+  const updated_event = await Event.findById(req.body.id)
 
   res.json({
     success: true,
-    current_event: updated_event
-  });
-};
+    current_event: updated_event,
+  })
+}
 
 exports.getCurrentEvent = async (req, res) => {
-  const current_event = await Event.findOne({ status: {$lt: 3} })
+  const current_event = await Event.findOne({ status: { $lt: 3 } })
 
   res.json({
     success: true,
-    current_event: current_event
+    current_event: current_event,
   })
 }
 
 /*========================= CartPage =============================*/
 exports.get_tickets = async (req, res) => {
-  const current_event = await Event.findOne({status: 0});
+  const current_event = await Event.findOne({ status: 0 })
 
-  let tickets = [];
+  let tickets = []
 
-  tickets.push(current_event.main);
-  tickets.psuh(current_event.satellite);
+  tickets.push(current_event.main)
+  tickets.psuh(current_event.satellite)
 
   res.json({
     success: true,
-    tickets
-  });
-};
+    tickets,
+  })
+}
 /*========================= CartPage =============================*/
 
 /*========================= PlayGame =============================*/
 exports.assignSatelliteTable = async (req, res) => {
-  const {satelliteId, roomnumber} = req.body
+  const { satelliteId, roomnumber } = req.body
 
-  let event = await Event.findOne({status: 0});
-  let day = await Day.findOne({event_id: event._id}).populate('room', 'roomnumber').sort({'daynumber': -1});
+  let event = await Event.findOne({ status: 0 })
+  let day = await Day.findOne({ event_id: event._id })
+    .populate('room', 'roomnumber')
+    .sort({ daynumber: -1 })
 
-  let newRoom;
+  let newRoom
 
-  if(day == null) { // when there is no day info in day table.
+  if (day == null) {
+    // when there is no day info in day table.
     day = new Day({
       daynumber: 1,
       event_id: event._id,
@@ -441,38 +491,44 @@ exports.assignSatelliteTable = async (req, res) => {
 
     newRoom = new Room({
       roomnumber: roomnumber,
-      day: day._id
-    });
-    await newRoom.save();
+      day: day._id,
+    })
+    await newRoom.save()
 
-    day.room = [newRoom._id];
-    await day.save();
-  } else {  // when there is a day info in day table.
-    let roomflag = day.room.filter(item => item.roomnumber == roomnumber).length > 0;
-    if(!roomflag) { // when there is a roomnumber info in day's room field.
+    day.room = [newRoom._id]
+    await day.save()
+  } else {
+    // when there is a day info in day table.
+    let roomflag =
+      day.room.filter((item) => item.roomnumber == roomnumber).length > 0
+    if (!roomflag) {
+      // when there is a roomnumber info in day's room field.
       newRoom = new Room({
         roomnumber: roomnumber,
-        day: day._id
-      });
+        day: day._id,
+      })
 
-      await newRoom.save();
-      day.room = [...day.room, newRoom._id];
-      await day.save();
+      await newRoom.save()
+      day.room = [...day.room, newRoom._id]
+      await day.save()
     }
   }
 
-  let satelliteEvent = event.satellite.filter(item => item._id.toString() == satelliteId);
+  let satelliteEvent = event.satellite.filter(
+    (item) => item._id.toString() == satelliteId,
+  )
 
   let maps
   var newMainTicket
-  var i = 0, j = 0
+  var i = 0,
+    j = 0
 
-  SatelliteTicket.find({ satelliteId: satelliteId }).then(async data => {
-    maps = data;
+  SatelliteTicket.find({ satelliteId: satelliteId }).then(async (data) => {
+    maps = data
     var newMainTicket = {}
 
     for (i = 0; i < satelliteEvent[0].winners; i++) {
-      let winnerNumber = Math.ceil(Math.random() * 1000) % maps.length;
+      let winnerNumber = Math.ceil(Math.random() * 1000) % maps.length
       await SatelliteTicket.findOneAndUpdate(
         { _id: maps[winnerNumber]._id },
         { $set: { status: true } },
@@ -481,28 +537,31 @@ exports.assignSatelliteTable = async (req, res) => {
       newMainTicket = new MainTicket({
         user_id: maps[winnerNumber].user_id,
         satelliteId: satelliteId,
-        event: event._id
+        event: event._id,
       })
       await newMainTicket.save()
-      maps.splice(winnerNumber, 1);
+      maps.splice(winnerNumber, 1)
     }
 
     MainTicket.find({ satelliteId: satelliteId }).then(async (maindata) => {
       maps = maindata
       let temp = []
       let tempuser_id = []
-      let avoiderror = 0;
-      j = (roomnumber) * 2000;
+      let avoiderror = 0
+      j = roomnumber * 2000
 
       while (true) {
-        var isExistRoomNumber = await Table.findOne({table: j});
+        var isExistRoomNumber = await Table.findOne({ table: j })
 
-        if(isExistRoomNumber) {
-          j++; continue;
+        if (isExistRoomNumber) {
+          j++
+          continue
         }
 
         for (i = 0; i < maps.length; i++) {
-          let flag = tempuser_id.filter(item => item.toString() == maps[i].user_id.toString()).length;
+          let flag = tempuser_id.filter(
+            (item) => item.toString() == maps[i].user_id.toString(),
+          ).length
 
           if (flag < 2) {
             await MainTicket.findOneAndUpdate(
@@ -524,103 +583,109 @@ exports.assignSatelliteTable = async (req, res) => {
             temp.push(maps[i]._id)
             tempuser_id.push(maps[i].user_id)
             maps.splice(i, 1)
-            avoiderror = 0;
+            avoiderror = 0
             i--
           } else {
-            avoiderror++;
-            continue;
+            avoiderror++
+            continue
           }
           if (temp.length == 10 || maps.length === 0) {
             newTable = new Table({
               table: j,
               seat: temp,
-              day: day._id
+              day: day._id,
             })
 
             await newTable.save()
-            j++;
-            temp = [];
-            tempuser_id = [];
-            break;
+            j++
+            temp = []
+            tempuser_id = []
+            break
           }
         }
 
-        console.log("maps.length => ", maps.length)
+        console.log('maps.length => ', maps.length)
         if (maps.length === 0) {
           break
         }
 
-        if(avoiderror > maps.length) {
+        if (avoiderror > maps.length) {
           newTable = new Table({
             table: j,
             seat: temp,
-            day: day._id
+            day: day._id,
           })
 
           await newTable.save()
-          j++;
-          temp = [];
-          tempuser_id = [];
+          j++
+          temp = []
+          tempuser_id = []
         }
       }
     })
   })
 
-  let event_satellite = event.satellite;
-  for (i = 0; i < event_satellite.length; i++){
-    if(event_satellite[i]._id.toString() == satelliteId) break;
+  let event_satellite = event.satellite
+  for (i = 0; i < event_satellite.length; i++) {
+    if (event_satellite[i]._id.toString() == satelliteId) break
   }
-  event_satellite[i].status = false;
-  await event.save();
-  res.json("OK")
-};
+  event_satellite[i].status = false
+  await event.save()
+  res.json('OK')
+}
 
 exports.makeTable = async (req, res) => {
-  let event = await Event.findOne({status: {$lt : 3}});
-  let day = await Day.findOne({event_id: event._id}).sort({'daynumber': -1});
+  let event = await Event.findOne({ status: { $lt: 3 } })
+  let day = await Day.findOne({ event_id: event._id }).sort({ daynumber: -1 })
 
-  let winnerCount = await MainTicket.find({ status: true }).count();
-  day.entry = winnerCount;
-  await day.save();
+  let winnerCount = await MainTicket.find({ status: true }).count()
+  day.entry = winnerCount
+  await day.save()
 
-  MainTicket.find({ status: true, satelliteId: null }).then(async (data) => { // except satellite when make first table
+  MainTicket.find({ status: true, satelliteId: null }).then(async (data) => {
+    // except satellite when make first table
     let maps = data
     let temp = []
     let tempuser_id = []
     let newTable, newRoom
-    let avoiderror = 0; // avoid always flag == 2
-    var i = 0, j = 0
+    let avoiderror = 0 // avoid always flag == 2
+    var i = 0,
+      j = 0
 
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    let roomcount = Math.ceil(data.length/20000);
+    let roomcount = Math.ceil(data.length / 20000)
 
     for (i = 0; i < roomcount; i++) {
-      let existRoom =  await Room.findOne({roomnumber: i, day: day._id})
+      let existRoom = await Room.findOne({ roomnumber: i, day: day._id })
 
-      if(existRoom === null) {
+      if (existRoom === null) {
         newRoom = new Room({
           roomnumber: i,
           day: day._id,
-        });
+        })
 
-        newRoom.save();
+        newRoom.save()
 
-        day.room = [...day.room, newRoom._id];
-        await day.save();
+        day.room = [...day.room, newRoom._id]
+        await day.save()
       }
     }
 
     while (true) {
-      var isExistRoomNumber = await Table.findOne({table: j, day: day._id}); //if j is existed in table number, continue
+      var isExistRoomNumber = await Table.findOne({ table: j, day: day._id }) //if j is existed in table number, continue
 
-      if(isExistRoomNumber) {
-        j++; continue;
+      if (isExistRoomNumber) {
+        j++
+        continue
       }
 
       for (i = 0; i < maps.length; i++) {
-        let flag = tempuser_id.filter(item => item.toString() == maps[i].user_id.toString()).length;
+        let flag = tempuser_id.filter(
+          (item) => item.toString() == maps[i].user_id.toString(),
+        ).length
 
-        if (flag < 2) { // check if there are more than 2 users in temp
+        if (flag < 2) {
+          // check if there are more than 2 users in temp
           await MainTicket.findOneAndUpdate(
             { _id: maps[i]._id },
             {
@@ -640,63 +705,68 @@ exports.makeTable = async (req, res) => {
           temp.push(maps[i]._id)
           tempuser_id.push(maps[i].user_id)
           maps.splice(i, 1)
-          avoiderror = 0;
-          i--;
+          avoiderror = 0
+          i--
         } else {
-          avoiderror++;
-          continue;
+          avoiderror++
+          continue
         }
         if (temp.length == 10 || maps.length === 0) {
           newTable = new Table({
             table: j,
             seat: temp,
-            day: day._id
+            day: day._id,
           })
 
           await newTable.save()
-          j++;
-          temp = [];
-          tempuser_id = [];
-          break;
+          j++
+          temp = []
+          tempuser_id = []
+          break
         }
       }
 
-      console.log("maps.length => ", maps.length)
+      console.log('maps.length => ', maps.length)
       if (maps.length === 0) {
         break
       }
 
-      if(avoiderror > maps.length) {
+      if (avoiderror > maps.length) {
         newTable = new Table({
           table: j,
           seat: temp,
-          day: day._id
+          day: day._id,
         })
 
         await newTable.save()
-        j++;
-        temp = [];
-        tempuser_id = [];
+        j++
+        temp = []
+        tempuser_id = []
       }
-
     }
 
-    res.json("OK");
+    res.json('OK')
   })
 
-  if(event.status == 0) {
-    event.status = 1;
-    await event.save();
+  if (event.status == 0) {
+    event.status = 1
+    await event.save()
   }
-};
+}
 
 exports.roomDraw = async (req, res) => {
-  let roomnumber = req.params.id;
+  let roomnumber = req.params.id
 
-  let event = await Event.findOne({status: {$lt : 3}});
-  let day = await Day.findOne({event_id: event._id}).sort({'daynumber': -1});
+  let event = await Event.findOne({ status: { $lt: 3 } })
+  let day = await Day.findOne({ event_id: event._id }).sort({ daynumber: -1 })
 
-  var tables = await Table.find({day: day._id, "table": {$lt : (Number(roomnumber) + 1)*2000 + 1, $gt : Number(roomnumber)*2000}})
+  var tables = await Table.find({
+    day: day._id,
+    table: {
+      $lt: (Number(roomnumber) + 1) * 2000 + 1,
+      $gt: Number(roomnumber) * 2000,
+    },
+  })
 
   for (var i = tables.length - 1; i >= 0; i--) {
     let temp = tables[i].seat
@@ -718,31 +788,34 @@ exports.roomDraw = async (req, res) => {
     let temp = tables[i].seat
 
     for (var j = temp.length - 1; j >= 0; j--) {
-      let tempMainTicket = await MainTicket.findOne({ _id: temp[j]._id, status: true })
-      if(tempMainTicket) {
-        tempMainTicket.history = [...tempMainTicket.history, null];
+      let tempMainTicket = await MainTicket.findOne({
+        _id: temp[j]._id,
+        status: true,
+      })
+      if (tempMainTicket) {
+        tempMainTicket.history = [...tempMainTicket.history, null]
 
-        await tempMainTicket.save();
+        await tempMainTicket.save()
       }
     }
-    console.log("tempMainTicket =>", i)
+    console.log('tempMainTicket =>', i)
   }
 
-  let room = await Room.findOne({roomnumber: roomnumber, day: day._id})
-  room.status = true;
-  await room.save();
-  res.json("OK");
+  let room = await Room.findOne({ roomnumber: roomnumber, day: day._id })
+  room.status = true
+  await room.save()
+  res.json('OK')
 }
 
 exports.endDay = async (req, res) => {
-  let event = await Event.findOne({status: {$lt : 3}});
-  let day = await Day.findOne({event_id: event._id}).sort({'daynumber': -1});
+  let event = await Event.findOne({ status: { $lt: 3 } })
+  let day = await Day.findOne({ event_id: event._id }).sort({ daynumber: -1 })
 
-  day.status = false;
+  day.status = false
 
   let newDay = new Day({
-    daynumber: day.daynumber+1,
-    event_id: event._id
+    daynumber: day.daynumber + 1,
+    event_id: event._id,
   })
 
   MainTicket.find({ status: true }).then(async (data) => {
@@ -750,35 +823,38 @@ exports.endDay = async (req, res) => {
     let temp = []
     let tempuser_id = []
     let newTable, newRoom
-    let avoiderror = 0; // avoid always flag == 2
-    var i = 0, j = 0
+    let avoiderror = 0 // avoid always flag == 2
+    var i = 0,
+      j = 0
 
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    let roomcount = Math.ceil(data.length/20000);
+    let roomcount = Math.ceil(data.length / 20000)
 
     for (i = 0; i < roomcount; i++) {
-      let existRoom =  await Room.findOne({roomnumber: i, day: newDay._id})
-      if(existRoom === null) {
+      let existRoom = await Room.findOne({ roomnumber: i, day: newDay._id })
+      if (existRoom === null) {
         newRoom = new Room({
           roomnumber: i,
           day: newDay._id,
-        });
+        })
 
-        await newRoom.save();
+        await newRoom.save()
 
-        newDay.room = [...newDay.room, newRoom._id];
-        await newDay.save();
+        newDay.room = [...newDay.room, newRoom._id]
+        await newDay.save()
       }
     }
 
     while (true) {
-
       for (i = 0; i < maps.length; i++) {
-        let flag = tempuser_id.filter(item => item.toString() == maps[i].user_id.toString()).length;
+        let flag = tempuser_id.filter(
+          (item) => item.toString() == maps[i].user_id.toString(),
+        ).length
 
-        if (flag < 2) { // check if there are more than 2 users in temp
-          let maphistory = maps[i].history;
-          if(maphistory[maps[i].history.length - 1] == null) {
+        if (flag < 2) {
+          // check if there are more than 2 users in temp
+          let maphistory = maps[i].history
+          if (maphistory[maps[i].history.length - 1] == null) {
             maphistory.splice(map.history.length - 1, 1)
           }
 
@@ -801,81 +877,80 @@ exports.endDay = async (req, res) => {
           temp.push(maps[i]._id)
           tempuser_id.push(maps[i].user_id)
           maps.splice(i, 1)
-          avoiderror = 0;
+          avoiderror = 0
           i--
         } else {
-          avoiderror++;
-          continue;
+          avoiderror++
+          continue
         }
         if (temp.length == 10 || maps.length === 0) {
           newTable = new Table({
             table: j,
             seat: temp,
-            day: newDay._id
+            day: newDay._id,
           })
 
           await newTable.save()
-          j++;
-          temp = [];
-          tempuser_id = [];
-          break;
+          j++
+          temp = []
+          tempuser_id = []
+          break
         }
       }
 
-      console.log("maps.length => ", maps.length)
+      console.log('maps.length => ', maps.length)
       if (maps.length === 0) {
         break
       }
 
-      if(avoiderror > maps.length) {
+      if (avoiderror > maps.length) {
         newTable = new Table({
           table: j,
           seat: temp,
-          day: newDay._id
+          day: newDay._id,
         })
 
         await newTable.save()
-        j++;
-        temp = [];
-        tempuser_id = [];
+        j++
+        temp = []
+        tempuser_id = []
       }
-
     }
 
-    res.json("OK");
+    res.json('OK')
   })
 
-  let winnerCount = await MainTicket.find({ status: true }).count();
-  
+  let winnerCount = await MainTicket.find({ status: true }).count()
+
   day.winner = winnerCount
-  newDay.entry = winnerCount;
+  newDay.entry = winnerCount
 
-  await newDay.save();
-  await day.save();
+  await newDay.save()
+  await day.save()
 
-  if(event.status == 0) {
-    event.status = 1;
-    await event.save();
+  if (event.status == 0) {
+    event.status = 1
+    await event.save()
   }
 }
 
 exports.finalRoom = async (req, res) => {
-  let finalwinner = Number(req.params.id);
+  let finalwinner = Number(req.params.id)
 
-  let event = await Event.findOne({status: {$lt : 3}});
-  let day = await Day.findOne({event_id: event._id}).sort({'daynumber': -1});
+  let event = await Event.findOne({ status: { $lt: 3 } })
+  let day = await Day.findOne({ event_id: event._id }).sort({ daynumber: -1 })
 
-  var tables = await Table.find({day: day._id})
+  var tables = await Table.find({ day: day._id })
 
-  let total = 0;
+  let total = 0
 
-  day.status = false;
-  day.winner = finalwinner;
+  day.status = false
+  day.winner = finalwinner
 
   for (var i = tables.length - 1; i >= 0 && total <= finalwinner; i--) {
     let temp = tables[i].seat
 
-    let randomlimit = Math.ceil(Math.random() * 100) % 3;
+    let randomlimit = Math.ceil(Math.random() * 100) % 3
 
     for (var j = temp.length - 1; j > randomlimit; j--) {
       let rand = Math.ceil(Math.random() * 100) % temp.length
@@ -892,18 +967,18 @@ exports.finalRoom = async (req, res) => {
     // await Table.findOneAndUpdate({ _id: tables[i]._id }, {$set: {'seat': temp} })
   }
 
-  let rooms = await Room.find({day: day._id});
+  let rooms = await Room.find({ day: day._id })
 
-  for(i = 0; i < rooms.length; i++){
-    rooms[i].status = true;
-    await rooms[i].save();
+  for (i = 0; i < rooms.length; i++) {
+    rooms[i].status = true
+    await rooms[i].save()
   }
 
-  await day.save();
-  event.status = 2;
-  await event.save();
+  await day.save()
+  event.status = 2
+  await event.save()
 
-  res.json("OK")
+  res.json('OK')
 }
 
 exports.payment = async (req, res) => {
@@ -970,14 +1045,14 @@ exports.payment = async (req, res) => {
 }
 
 exports.getFinalWinner = async (req, res) => {
-  let event = await Event.findOne({status: 2});
+  let event = await Event.findOne({ status: 2 })
 
-  if(event) {
-    MainTicket.find({status: false})
-      .sort({history: -1})
+  if (event) {
+    MainTicket.find({ status: false })
+      .sort({ history: -1 })
       .limit(event.winner)
-      .populate("user_id")
-      .then(data => res.json(data))
+      .populate('user_id')
+      .then((data) => res.json(data))
   } else {
     res.json([])
   }
@@ -985,10 +1060,9 @@ exports.getFinalWinner = async (req, res) => {
 
 /*========================= PlayGame =============================*/
 
-
 /*========================= Create Mock Data =============================*/
 exports.createMockData = async (req, res) => {
-  let event = await Event.findOne({status: 0});
+  let event = await Event.findOne({ status: 0 })
 
   var newMainTicket = {}
 
@@ -999,12 +1073,12 @@ exports.createMockData = async (req, res) => {
         newMainTicket = new MainTicket({
           user_id: users[i]._id,
           username: users[i].username,
-          event: event._id
+          event: event._id,
         })
         await newMainTicket.save()
       }
     }
-    res.json("OK")
+    res.json('OK')
   })
 }
 /*========================================================================*/

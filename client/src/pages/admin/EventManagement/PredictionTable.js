@@ -21,7 +21,7 @@ import {
   FormControl,
   Modal,
   Backdrop,
-  Fade
+  Fade,
 } from '@material-ui/core'
 import { ExpandMore } from '@material-ui/icons'
 // hooks
@@ -34,8 +34,8 @@ import Page from '../../../components/Page'
 
 export default function PredictionTable() {
   const { themeStretch } = useSettings()
-  const [open, setOpen] = React.useState(false);
-  const [winner, setWinner] = React.useState(1);
+  const [open, setOpen] = React.useState(false)
+  const [winner, setWinner] = React.useState(1)
 
   const {
     current_event,
@@ -45,24 +45,24 @@ export default function PredictionTable() {
     days,
     endDay,
     finalRoom,
-    loading
+    loading,
   } = useDraw()
 
   useEffect(() => {
-    getCurrentEvent();
+    getCurrentEvent()
     getAllDays()
   }, [])
 
   const setFinalWinner = (val) => setWinner(Number(val))
 
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleOpen = () => setOpen(true)
+  const handleClose = () => setOpen(false)
 
   const onSubmit = async (e) => {
-    e.preventDefault();
-    finalRoom(winner);
-    handleClose();
-  };
+    e.preventDefault()
+    finalRoom(winner)
+    handleClose()
+  }
 
   const style = {
     position: 'absolute',
@@ -74,22 +74,65 @@ export default function PredictionTable() {
     borderRadius: '20px',
     boxShadow: 24,
     p: 4,
-  };
+  }
 
-  let roomname = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+  let roomname = [
+    'A',
+    'B',
+    'C',
+    'D',
+    'E',
+    'F',
+    'G',
+    'H',
+    'I',
+    'J',
+    'K',
+    'L',
+    'M',
+    'N',
+    'O',
+    'P',
+    'Q',
+    'R',
+    'S',
+    'T',
+    'U',
+    'V',
+    'W',
+    'X',
+    'Y',
+    'Z',
+  ]
 
-  let finalWinner = days.length > 0 ? days[days.length - 1].entry : 1;
+  let finalWinner = days.length > 0 ? days[days.length - 1].entry : 1
 
   const startFlag = (item) => {
-    return item.room.filter(roomitem => roomitem.status).length == 0 || !item.status || loading
+    return (
+      item.room.filter((roomitem) => roomitem.status).length == 0 ||
+      !item.status ||
+      loading
+    )
   }
 
   return (
     <>
-      <Stack spacing={2} direction="row" sx={{ mb: 2, justifyContent: 'right' }}>
-        <Button variant="contained" sx={{
-          '&:hover': { backgroundColor: '#ff0032'}
-        }} onClick={handleOpen} disabled={days.status != 1}> End Current Event Now !</Button>
+      <Stack
+        spacing={2}
+        direction="row"
+        sx={{ mb: 2, justifyContent: 'right' }}
+      >
+        <Button
+          variant="contained"
+          sx={{
+            '&:hover': { backgroundColor: '#ff0032' },
+          }}
+          onClick={handleOpen}
+          disabled={days.status != 1}
+        >
+          {' '}
+          End Current Event Now !
+        </Button>
       </Stack>
       <TableContainer>
         <Table>
@@ -102,57 +145,90 @@ export default function PredictionTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {
-              days.map((item, index) => (
-                <>
-                  <TableRow>
-                    <TableCell>Day {index+1}</TableCell>
-                    <TableCell>{item.entry}</TableCell>
-                    <TableCell>{item.winner}</TableCell>
-                    <TableCell>
-                      <ButtonGroup variant="contained" aria-label="outlined primary button group">
-                        <Button variant="contained" sx={{
-                            backgroundColor: '#ff0032', color: '#fff',
-                          '&:hover': { backgroundColor: '#yello', color: '#000' }
-                        }} onClick={endDay} disabled={startFlag(item)}> {loading ? "Loading..." :"End Day"} </Button>
-                        <Button sx={{
-                            backgroundColor: 'yellow', color: '#000',
-                            '&:hover': { backgroundColor: '#29B2FE', color: '#fff' }
-                          }} disabled={!item.status || loading} onClick={handleOpen}>{loading ? "Loading..." :"Final Draw"}</Button>
-                      </ButtonGroup>
-                    </TableCell>
-                  </TableRow>
+            {days.map((item, index) => (
+              <React.Fragment key={index}>
+                <TableRow>
+                  <TableCell>Day {index + 1}</TableCell>
+                  <TableCell>{item.entry}</TableCell>
+                  <TableCell>{item.winner}</TableCell>
+                  <TableCell>
+                    <ButtonGroup
+                      variant="contained"
+                      aria-label="outlined primary button group"
+                    >
+                      <Button
+                        variant="contained"
+                        sx={{
+                          backgroundColor: '#ff0032',
+                          color: '#fff',
+                          '&:hover': {
+                            backgroundColor: '#yello',
+                            color: '#000',
+                          },
+                        }}
+                        onClick={endDay}
+                        disabled={startFlag(item)}
+                      >
+                        {' '}
+                        {loading ? 'Loading...' : 'End Day'}{' '}
+                      </Button>
+                      <Button
+                        sx={{
+                          backgroundColor: 'yellow',
+                          color: '#000',
+                          '&:hover': {
+                            backgroundColor: '#29B2FE',
+                            color: '#fff',
+                          },
+                        }}
+                        disabled={!item.status || loading}
+                        onClick={handleOpen}
+                      >
+                        {loading ? 'Loading...' : 'Final Draw'}
+                      </Button>
+                    </ButtonGroup>
+                  </TableCell>
+                </TableRow>
 
-                  <TableRow>
-                    <TableCell colSpan={3}>
-                      <Accordion>
-                        <AccordionSummary
-                          expandIcon={<ExpandMore />}
-                          aria-controls="panel1a-content"
-                          id="panel1a-header"
-                        >
-                          <Typography>Rooms</Typography>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                          <Stack spacing={1}>
-                            {
-                              item.room.map((roomitem, index) => (
-                                <Button variant="contained" sx={{
-                                  backgroundColor: 'yellow', color: '#000',
-                                  '&:hover': { backgroundColor: '#29B2FE', color: '#fff' }
-                                }} key={index} onClick={() => roomDraw(roomitem.roomnumber)} disabled={roomitem.status || loading}>
-                                  {loading ? "Loading..." : roomname[roomitem.roomnumber]+" - DRAW"}
-                                </Button>
-                              ))
-                            }
-                          </Stack>
-                        </AccordionDetails>
-                      </Accordion>
-                    </TableCell>
-                  </TableRow>
-                </>
-              ))
-            }
+                <TableRow>
+                  <TableCell colSpan={3}>
+                    <Accordion>
+                      <AccordionSummary
+                        expandIcon={<ExpandMore />}
+                        aria-controls="panel1a-content"
+                        id="panel1a-header"
+                      >
+                        <Typography>Rooms</Typography>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <Stack spacing={1}>
+                          {item.room.map((roomitem, index) => (
+                            <Button
+                              variant="contained"
+                              sx={{
+                                backgroundColor: 'yellow',
+                                color: '#000',
+                                '&:hover': {
+                                  backgroundColor: '#29B2FE',
+                                  color: '#fff',
+                                },
+                              }}
+                              key={index}
+                              onClick={() => roomDraw(roomitem.roomnumber)}
+                              disabled={roomitem.status || loading}
+                            >
+                              {loading
+                                ? 'Loading...'
+                                : roomname[roomitem.roomnumber] + ' - DRAW'}
+                            </Button>
+                          ))}
+                        </Stack>
+                      </AccordionDetails>
+                    </Accordion>
+                  </TableCell>
+                </TableRow>
+              </React.Fragment>
+            ))}
           </TableBody>
         </Table>
       </TableContainer>
@@ -170,7 +246,12 @@ export default function PredictionTable() {
       >
         <Fade in={open}>
           <Box sx={style}>
-            <Typography id="transition-modal-title" variant="h6" component="h2" sx={{ textAlign: "center" }}>
+            <Typography
+              id="transition-modal-title"
+              variant="h6"
+              component="h2"
+              sx={{ textAlign: 'center' }}
+            >
               Select Final Winner
             </Typography>
 
@@ -180,15 +261,31 @@ export default function PredictionTable() {
               label="Event Name"
               value={winner}
               onChange={(e) => setFinalWinner(e.target.value)}
-              sx={{mt: 3}}
+              sx={{ mt: 3 }}
               type="number"
               inputProps={{ min: 0, max: finalWinner }}
             />
-            <Stack spacing={2} direction="row" justifyContent="right" sx={{ mt: 3 }}>
-              <Button onClick={onSubmit} variant="outlined" sx={{ background: "transparent" }}>OK</Button>
-              <Button onClick={handleClose} variant="contained" sx={{ background: "transparent" }}>Close</Button>
+            <Stack
+              spacing={2}
+              direction="row"
+              justifyContent="right"
+              sx={{ mt: 3 }}
+            >
+              <Button
+                onClick={onSubmit}
+                variant="outlined"
+                sx={{ background: 'transparent' }}
+              >
+                OK
+              </Button>
+              <Button
+                onClick={handleClose}
+                variant="contained"
+                sx={{ background: 'transparent' }}
+              >
+                Close
+              </Button>
             </Stack>
-
           </Box>
         </Fade>
       </Modal>
