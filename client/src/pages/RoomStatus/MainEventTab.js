@@ -20,9 +20,15 @@ import useDraw from 'hooks/useDraw'
 
 export default function MainEventTab({ eventId }) {
   const theme = useTheme()
-  const { getSearchData, users, expectedUsersAmount, clearUsers } = useDraw()
+  const {
+    getSearchData,
+    users,
+    expectedUsersAmount,
+    clearUsers,
+    getRandomTablesByUserId,
+  } = useDraw()
   const [searchKey, setSearchKey] = useState('')
-  const [pageSize, setPageSize] = useState(20)
+  const [pageSize, setPageSize] = useState(23)
   const [pageNumber, setPageNumber] = useState(1)
   const [selectedUserId, setSelectedUserId] = useState('')
 
@@ -35,6 +41,12 @@ export default function MainEventTab({ eventId }) {
     clearUsers()
     initializePageData()
     getSearchData(sKey, { pageSize, pageNumber, eventId })
+  }
+
+  const getTablesByUser = (user) => {
+    console.log(user)
+    setSelectedUserId(user._id)
+    getRandomTablesByUserId(user._id)
   }
 
   const fetchNextData = () => {
@@ -104,12 +116,19 @@ export default function MainEventTab({ eventId }) {
             <TableBody>
               {users &&
                 users.map((item, key) => (
-                  <TableRow key={key} hover={true} selected={true}>
-                    <TableCell>{item._id}</TableCell>
+                  <TableRow
+                    key={key}
+                    hover={true}
+                    selected={selectedUserId === item._id ? true : false}
+                    onClick={() => getTablesByUser(item)}
+                  >
+                    <TableCell>{item.username}</TableCell>
                     <TableCell>{item.ticketAmount}</TableCell>
                     <TableCell>Views Table</TableCell>
                     <TableCell>
-                      TBD OR {item.winAmount}L OR {item.loseAmount}W
+                      {item.winAmount && `${item.winAmount}W`}&nbsp;
+                      {item.loseAmount && `${item.loseAmount}L`}
+                      {!item.winAmount && !item.loseAmount && 'TBD'}
                     </TableCell>
                   </TableRow>
                 ))}

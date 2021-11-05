@@ -239,8 +239,9 @@ function DrawProvider({ children }) {
       `/api/draw/getRandomTablesByUserId/${userId}`,
     )
     const { status, data } = response
-
+    console.log(data)
     if (status === 200) {
+      console.log(data)
       dispatch({
         type: 'SET_TABLES',
         payload: {
@@ -265,7 +266,7 @@ function DrawProvider({ children }) {
       dispatch({
         type: 'SET_EXPECTED_USERS_AMOUNT',
         payload: {
-          expectedUsersAmount: data.metadata[0].total,
+          expectedUsersAmount: data.metadata[0] ? data.metadata[0].total : 0,
         },
       })
       dispatch({
@@ -303,7 +304,6 @@ function DrawProvider({ children }) {
       reqData,
     )
     const { status, data } = response
-
     if (status === 200) {
       dispatch({
         type: 'SET_TABLES',

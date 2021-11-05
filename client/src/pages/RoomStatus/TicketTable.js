@@ -4,6 +4,7 @@ import { Box, Avatar, Paper, Stack, Typography } from '@material-ui/core'
 import PersonIcon from '@material-ui/icons/Person'
 import Ticket from './Ticket'
 import useDraw from 'hooks/useDraw'
+import { SERVER_UPLOAD_URL } from 'utils/constants'
 
 export default function TicketTable({ table }) {
   const { currentDay } = useDraw()
@@ -22,9 +23,9 @@ export default function TicketTable({ table }) {
     return () => window.removeEventListener('resize', updateSize)
   }, [])
 
-  let card = [];
+  let card = []
   for (var i = 0; i < table.seat.length; i++) {
-    if(table.seat[i].history.length > currentDay) card.push(i+1);
+    if (table.seat[i].history.length > currentDay) card.push(i + 1)
   }
 
   return (
@@ -120,15 +121,27 @@ export default function TicketTable({ table }) {
             >
               <Stack spacing={-1}>
                 <Stack direction="row" justifyContent="center">
-                  <Avatar
-                    sx={{
-                      bgcolor: '#000',
-                      color: 'white',
-                      border: matchedTicket.history.length > currentDay && '1px solid red',
-                    }}
-                  >
-                    <PersonIcon />
-                  </Avatar>
+                  {matchedTicket.user_id.avatar ? (
+                    <Avatar
+                      src={
+                        SERVER_UPLOAD_URL + matchedTicket.user_id.avatar.name
+                      }
+                      alt={matchedTicket.user_id.avatar.name}
+                    />
+                  ) : (
+                    <Avatar
+                      sx={{
+                        bgcolor: '#000',
+                        color: 'white',
+                        border:
+                          matchedTicket.history.length > currentDay &&
+                          '1px solid red',
+                        // border: matchedTicket.status && '1px solid red',
+                      }}
+                    >
+                      <PersonIcon />
+                    </Avatar>
+                  )}
                 </Stack>
                 <Stack direction="row" justifyContent="center">
                   <Paper
@@ -138,6 +151,7 @@ export default function TicketTable({ table }) {
                       p: 0.5,
                       fontSize: 9,
                       minWidth: 70,
+                      zIndex: 100,
                     }}
                   >
                     <Typography align="center" fontSize="inherit">
@@ -162,15 +176,9 @@ export default function TicketTable({ table }) {
       })}
       <Box position="absolute" sx={{ top: '35%' }} width="100%">
         <Stack direction="row" justifyContent="center" spacing={1}>
-          {card.map(
-            (ticket, key) =>
-              (
-                <Ticket
-                  key={key}
-                  value={ticket}
-                />
-              ),
-          )}
+          {card.map((ticket, key) => (
+            <Ticket key={key} value={ticket} />
+          ))}
         </Stack>
       </Box>
     </Box>

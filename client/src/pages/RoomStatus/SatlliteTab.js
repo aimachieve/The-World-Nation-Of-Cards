@@ -18,7 +18,7 @@ import { useTheme } from '@material-ui/private-theming'
 
 import useDraw from 'hooks/useDraw'
 
-export default function Satellite1Tab({ satelliteEventId }) {
+export default function SatelliteTab({ satelliteEventId }) {
   const theme = useTheme()
   const {
     getSatelliteUsersByEventId,
@@ -30,7 +30,6 @@ export default function Satellite1Tab({ satelliteEventId }) {
   const [searchKey, setSearchKey] = useState('')
   const [pageSize, setPageSize] = useState(35)
   const [pageNumber, setPageNumber] = useState(1)
-  console.log(satelliteEventId)
 
   useEffect(() => {
     clearUsers()
@@ -121,10 +120,12 @@ export default function Satellite1Tab({ satelliteEventId }) {
               {users &&
                 users.map((item, key) => (
                   <TableRow key={key}>
-                    <TableCell>{item._id}</TableCell>
+                    <TableCell>{item.username}</TableCell>
                     <TableCell>{item.ticketAmount}</TableCell>
                     <TableCell>
-                      TBD OR {item.winAmount}L OR {item.loseAmount}W
+                      {item.winAmount && `${item.winAmount}W`}&nbsp;
+                      {item.loseAmount && `${item.loseAmount}L`}
+                      {!item.winAmount && !item.loseAmount && 'TBD'}
                     </TableCell>
                   </TableRow>
                 ))}

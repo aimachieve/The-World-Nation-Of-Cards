@@ -55,16 +55,16 @@ exports.getProducts = (req, res) => {
 }
 
 /**
- * Get 12 random tables from DB.
+ * Get 10 random tables from DB.
  * @param {object} req
  * @param {object} res
  * @returns
  */
 exports.getRandomTables = async (req, res) => {
-  const tables = await Table.aggregate([{ $sample: { size: 12 } }])
+  const tables = await Table.aggregate([{ $sample: { size: 10 } }])
   await Table.populate(tables, {
     path: 'seat',
-    populate: [{ path: 'user_id' }],
+    populate: [{ path: 'user_id', populate: [{ path: 'avatar' }] }],
   })
     .then((results) => {
       return res.status(200).json(results)
@@ -75,23 +75,35 @@ exports.getRandomTables = async (req, res) => {
 }
 
 exports.getRandomTablesByUserId = async (req, res) => {
+  const resTables = []
   const { userId } = req.params
   const tables = await Table.aggregate([
     { $unwind: '$seat' },
     {
       $lookup: {
-        from: 'seat',
+        from: 'maintickets',
         localField: 'seat',
         foreignField: '_id',
-        as: 'ticket',
+        as: 'seat',
       },
     },
     {
       $match: {
-        'ticket.status': true,
+        'seat.user_id': mongoose.Types.ObjectId(userId),
+        'seat.status': true,
       },
     },
+    { $sample: { size: 10 } },
   ])
+  console.log(tables)
+  for (let i = 0; i < tables.length; i += 1) {
+    let table = await Table.findById(tables[i]._id).populate({
+      path: 'seat',
+      populate: [{ path: 'user_id', populate: [{ path: 'avatar' }] }],
+    })
+    await resTables.push(table)
+  }
+  return res.status(200).json(resTables)
 }
 
 /**
@@ -108,7 +120,7 @@ exports.searchData = async (req, res) => {
       {
         $group: {
           _id: '$user_id',
-          username: '$username',
+          username: { $first: '$username' },
           ticketAmount: { $sum: 1 },
           winAmount: {
             $sum: {
@@ -149,7 +161,8 @@ exports.getAllUsers = async (req, res) => {
     [
       {
         $group: {
-          _id: '$username',
+          _id: '$user_id',
+          username: { $first: '$username' },
           ticketAmount: { $sum: 1 },
           winAmount: {
             $sum: {
@@ -217,7 +230,8 @@ exports.getSatelliteUsersByEventId = (req, res) => {
       },
       {
         $group: {
-          _id: '$username',
+          _id: '$user_id',
+          username: { $first: '$username' },
           ticketAmount: { $sum: 1 },
           winAmount: {
             $sum: {
@@ -266,7 +280,8 @@ exports.searchSatelliteUsersBySatelliteEventId = (req, res) => {
       },
       {
         $group: {
-          _id: '$username',
+          _id: '$user_id',
+          username: { $first: '$username' },
           ticketAmount: { $sum: 1 },
           winAmount: {
             $sum: {
@@ -345,7 +360,7 @@ exports.getRandomTablesByDayIdAndRoomNumber = async (req, res) => {
   for (let i = 0; i < tables.length; i += 1) {
     let table = await Table.findById(tables[i]._id).populate({
       path: 'seat',
-      populate: [{ path: 'user_id' }],
+      populate: [{ path: 'user_id', populate: [{ path: 'avatar' }] }],
     })
     await resTables.push(table)
   }
@@ -523,16 +538,19 @@ exports.resetPassword = async (req, res) => {
             password: hash,
           },
         },
-      ).then((user) => {
-        console.log(user)
-        res.json({ 
-          success: 'true',
-          user: user 
+      )
+        .then((user) => {
+          console.log(user)
+          res.json({
+            success: 'true',
+            user: user,
+          })
         })
-      })
-      .catch((err) => res.json({
-        succeess: 'false'
-      }))
+        .catch((err) =>
+          res.json({
+            succeess: 'false',
+          }),
+        )
     })
   })
 }
