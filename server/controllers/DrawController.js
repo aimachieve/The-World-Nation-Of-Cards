@@ -539,7 +539,6 @@ exports.resetPassword = async (req, res) => {
             password: hash,
           },
         },
-<<<<<<< Updated upstream
       )
         .then((user) => {
           console.log(user)
@@ -553,18 +552,6 @@ exports.resetPassword = async (req, res) => {
             succeess: 'false',
           }),
         )
-=======
-      ).then((user) => {
-        console.log(user)
-        res.json({
-          success: 'true',
-          user: user
-        })
-      })
-        .catch((err) => res.json({
-          succeess: 'false'
-        }))
->>>>>>> Stashed changes
     })
   })
 }
