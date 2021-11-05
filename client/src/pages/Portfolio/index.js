@@ -1,20 +1,25 @@
 /* eslint-disable */
 import React from 'react'
 import { styled } from '@material-ui/core/styles'
-import { Box, Grid, Container, Stack, Typography, Button, TextField } from '@material-ui/core';
+import {
+  Box,
+  Grid,
+  Container,
+  Stack,
+  Typography,
+  Button,
+  TextField,
+} from '@material-ui/core'
 
-import { MotionInView, varFadeInUp } from '../../components/animate';
+import { MotionInView, varFadeInUp } from '../../components/animate'
 
-import Banner from 'customComponents/Banner';
-import SignUpCTA from 'customComponents/SignUpCTA';
-import Item from './Item.js';
+import Banner from 'customComponents/Banner'
+import SignUpCTA from 'customComponents/SignUpCTA'
+import Item from './Item.js'
 
 const RootStyle = styled('div')(({ theme }) => ({
   width: '100%',
-  background: 'url(/images/site-background.jpg)',
-  backgroundSize: 'cover',
-  display: 'flex',
-  alignItems: 'center'
+  alignItems: 'center',
 }))
 
 const ContentStyle = styled('div')(({ theme }) => ({
@@ -25,51 +30,69 @@ const ContentStyle = styled('div')(({ theme }) => ({
 
 const MainStyle = styled('div')(({ theme }) => ({
   backgroundColor: '#000',
-  color: '#fff'
+  color: '#fff',
 }))
-
 
 export default function Portfolio() {
   return (
     <RootStyle>
       <ContentStyle>
-      {/* Banner */}
-      <Banner />
+        {/* Banner */}
+        <Banner />
 
-      {/* Drop a message */}
-        <Container maxWidth="lg">
-          <Stack spacing={2} direction="row" justifyContent="center" alignItems="center" sx={{
-            paddingTop: '30px',
-            paddingBottom: '30px'
-          }}>
-            <Item />
-            <Item />
-            <Item />
-            <Item />
-          </Stack>
-          <Stack spacing={2} direction="row" justifyContent="center" alignItems="center" sx={{
-            paddingTop: '30px',
-            paddingBottom: '30px'
-          }}>
-            <Item />
-            <Item />
-            <Item />
-            <Item />
-          </Stack>
-          <Stack spacing={2} direction="row" justifyContent="center" alignItems="center" sx={{
-            paddingTop: '30px',
-            paddingBottom: '30px'
-          }}>
-            <Item />
-            <Item />
-            <Item />
-            <Item />
-          </Stack>
-        </Container>
+        <Box sx={{ backgroundImage: 'url("/images/site-background.jpg")' }}>
+          {/* Drop a message */}
+          <Container maxWidth="xl">
+            <Stack
+              spacing={2}
+              direction="row"
+              justifyContent="center"
+              alignItems="center"
+              sx={{
+                paddingTop: '30px',
+                paddingBottom: '30px',
+              }}
+            >
+              <Item />
+              <Item />
+              <Item />
+              <Item />
+            </Stack>
+            <Stack
+              spacing={2}
+              direction="row"
+              justifyContent="center"
+              alignItems="center"
+              sx={{
+                paddingTop: '30px',
+                paddingBottom: '30px',
+              }}
+            >
+              <Item />
+              <Item />
+              <Item />
+              <Item />
+            </Stack>
+            <Stack
+              spacing={2}
+              direction="row"
+              justifyContent="center"
+              alignItems="center"
+              sx={{
+                paddingTop: '30px',
+                paddingBottom: '30px',
+              }}
+            >
+              <Item />
+              <Item />
+              <Item />
+              <Item />
+            </Stack>
+          </Container>
 
-      {/* Sign Up Now */}
-      <SignUpCTA />
-
+          {/* Sign Up Now */}
+          <SignUpCTA />
+        </Box>
       </ContentStyle>
     </RootStyle>
   )

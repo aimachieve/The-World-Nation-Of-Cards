@@ -43,7 +43,6 @@ export default function RoomStatus() {
   }, [])
 
   let event_status = current_event ? current_event.status == 2 : false ;
-console.log(tables)
   return (
     <RootStyle>
       <ContentStyle>
