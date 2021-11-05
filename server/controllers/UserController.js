@@ -5,6 +5,7 @@ const keys = require('../config/keys')
 
 const { otplibAuthenticator } = require('../config/otplib')
 const { mailgunHelper } = require('../config/mailgun')
+const { SERVER_ERROR } = require('../utils/constants')
 
 let otp
 
@@ -340,4 +341,15 @@ exports.updateProfile = (req, res) => {
       })
     }
   })
+}
+
+exports.getAllUsers = async (req, res) => {
+  const { pageNumber, pageSize } = req.body
+  const resData = {}
+  resData.data = await User.find()
+    .sort('username')
+    .skip(pageSize * (pageNumber - 1))
+    .limit(pageSize)
+  resData.totalNumber = await User.find().count()
+  return res.status(200).json(resData)
 }

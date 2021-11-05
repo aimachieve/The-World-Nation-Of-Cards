@@ -125,6 +125,7 @@ const DrawContext = createContext({
   finalRoom: () => Promise.resolve(),
   getFinalWinner: () => Promise.resolve(),
   sendEmailToAdmin: () => Promise.resolve(),
+  getAllUsers: () => Promise.resolve(),
 })
 
 function DrawProvider({ children }) {
@@ -485,6 +486,30 @@ function DrawProvider({ children }) {
     return response
   }
 
+  /**
+   * Get all users without regarding if he/she purchased some ticket
+   * @param {object} pageData
+   */
+  const getAllUsers = async (pageData) => {
+    const response = await axios.post('/api/account/getAllUsers', pageData)
+    console.log(response)
+    const { status, data } = response
+    if (status === 200) {
+      dispatch({
+        type: 'SET_EXPECTED_USERS_AMOUNT',
+        payload: {
+          expectedUsersAmount: data.totalNumber,
+        },
+      })
+      dispatch({
+        type: 'SET_USERS',
+        payload: {
+          users: data.data,
+        },
+      })
+    }
+  }
+
   return (
     <DrawContext.Provider
       value={{
@@ -511,6 +536,7 @@ function DrawProvider({ children }) {
         finalRoom,
         getFinalWinner,
         sendEmailToAdmin,
+        getAllUsers,
       }}
     >
       {children}

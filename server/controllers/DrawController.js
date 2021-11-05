@@ -139,7 +139,7 @@ exports.searchData = async (req, res) => {
 }
 
 /**
- * Get all users
+ * Get all users who purchased the tickets
  * @param {object} req
  * @param {object} res
  */
