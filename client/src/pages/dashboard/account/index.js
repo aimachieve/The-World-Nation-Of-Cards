@@ -22,8 +22,10 @@ import {
 
 import { LoadingButton } from '@material-ui/lab'
 import useAuth from 'hooks/useAuth'
+import useDraw from 'hooks/useDraw'
 import UploadAvatar from 'customComponents/UploadAvatar'
 import { fData } from 'utils/formatNumber'
+import ChooseAvatar from './ChooseAvatar'
 
 const RootStyle = styled(Page)({
   paddingTop: 176,
@@ -39,6 +41,7 @@ const ContentStyle = styled('div')(({ theme }) => ({
 
 export default function Account() {
   const { logout, updateProfile } = useAuth()
+  const { getAllAvatars } = useDraw()
 
   const [id, setID] = useState('')
   const [phone, setPhone] = useState('')
@@ -52,6 +55,7 @@ export default function Account() {
   const [avatar, setAvatar] = useState(null)
 
   useEffect(() => {
+    getAllAvatars()
     let user = localStorage.getItem('user')
     user = JSON.parse(user)
     setID(user._id)
@@ -60,11 +64,7 @@ export default function Account() {
     setLastname(user.name.split(' ')[1])
     setUsername(user.username)
     setEmail(user.email)
-    if (user.avatar) {
-      setAvatar(
-        `http://${window.location.hostname}:5000/uploads/${user.avatar}`,
-      )
-    }
+    setAvatar(user.avatar)
   }, [])
 
   const updateUser = () => {
@@ -72,31 +72,21 @@ export default function Account() {
       window.alert('please enter your new password')
       return
     }
-    let formData = new FormData()
-    formData.append('id', id)
-    formData.append('phone', phone)
-    formData.append('firstname', firstname)
-    formData.append('lastname', lastname)
-    formData.append('username', username)
-    formData.append('email', email)
-    formData.append('password', password)
-    formData.append('newpassword1', newpassword1)
-    if (avatar instanceof Object) {
-      formData.append('avatar', avatar.file)
+    const updatedUserInfo = {
+      id,
+      phone,
+      firstname,
+      lastname,
+      username,
+      email,
+      password,
+      newpassword1,
     }
-    updateProfile(formData)
+    if (avatar) {
+      updatedUserInfo.avatar = avatar._id
+    }
+    updateProfile(updatedUserInfo)
   }
-
-  const handleDrop = useCallback((acceptedFiles) => {
-    const file = acceptedFiles[0]
-    if (file) {
-      setAvatar({
-        file,
-        preview: URL.createObjectURL(file),
-      })
-      console.log(avatar)
-    }
-  })
 
   return (
     <RootStyle>
@@ -152,16 +142,7 @@ export default function Account() {
             <Grid item xs={12} md={9}>
               <Grid container sx={{ padding: '0 20px' }}>
                 <Grid item xs={12} sx={{ mb: 2 }}>
-                  <Grid container sx={{ padding: '0 20px' }}>
-                    <Stack direction="row" justifyContent="center">
-                      <UploadAvatar
-                        accept="image/*"
-                        maxSize={3145728}
-                        file={avatar}
-                        onDrop={handleDrop}
-                      />
-                    </Stack>
-                  </Grid>
+                  <ChooseAvatar avatar={avatar} setAvatar={setAvatar} />
                 </Grid>
                 <Grid item xs={12} sx={{ mb: 2 }}>
                   <Grid container sx={{ padding: '0 20px' }}>

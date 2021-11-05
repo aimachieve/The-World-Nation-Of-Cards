@@ -104,7 +104,7 @@ export default function MainEventTab({ eventId }) {
             <TableBody>
               {users &&
                 users.map((item, key) => (
-                  <TableRow key={key} hover={true}>
+                  <TableRow key={key} hover={true} selected={true}>
                     <TableCell>{item._id}</TableCell>
                     <TableCell>{item.ticketAmount}</TableCell>
                     <TableCell>Views Table</TableCell>

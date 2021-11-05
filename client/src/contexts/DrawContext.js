@@ -16,6 +16,7 @@ const initialState = {
   finalWinner: [],
   loading: false,
   tickets: [],
+  avatars: [],
 }
 
 const handlers = {
@@ -98,6 +99,14 @@ const handlers = {
       tickets: action.payload,
     }
   },
+  SET_AVATARS: (state, action) => {
+    const { avatars } = action.payload
+    console.log(avatars)
+    return {
+      ...state,
+      avatars: avatars,
+    }
+  },
 }
 
 const reducer = (state, action) =>
@@ -136,6 +145,7 @@ const DrawContext = createContext({
   sendEmailToAdmin: () => Promise.resolve(),
   getAllUsers: () => Promise.resolve(),
   getTicketsByUserId: () => Promise.resolve(),
+  getAllAvatars: () => Promise.resolve(),
 })
 
 function DrawProvider({ children }) {
@@ -146,6 +156,19 @@ function DrawProvider({ children }) {
 
     initialize()
   }, [])
+
+  const getAllAvatars = async () => {
+    const response = await axios.get('/api/account/getAllAvatars')
+    const { status, data } = response
+    if (status === 200) {
+      dispatch({
+        type: 'SET_AVATARS',
+        payload: {
+          avatars: data,
+        },
+      })
+    }
+  }
 
   const set_loading = (data) => {
     dispatch({
@@ -560,6 +583,7 @@ function DrawProvider({ children }) {
         sendEmailToAdmin,
         getAllUsers,
         getTicketsByUserId,
+        getAllAvatars,
       }}
     >
       {children}

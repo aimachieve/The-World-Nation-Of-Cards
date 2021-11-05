@@ -49,8 +49,8 @@ const UserSchema = new Schema({
     default: false,
   },
   avatar: {
-    type: String,
-    default: '',
+    type: Schema.ObjectId,
+    ref: 'avatars',
   },
 })
 
