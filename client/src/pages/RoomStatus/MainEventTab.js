@@ -12,16 +12,19 @@ import {
   TableBody,
   Typography,
   Divider,
+  useTheme,
 } from '@material-ui/core'
 import InfiniteScroll from 'react-infinite-scroll-component'
 
 import useDraw from 'hooks/useDraw'
 
 export default function MainEventTab({ eventId }) {
+  const theme = useTheme()
   const { getSearchData, users, expectedUsersAmount, clearUsers } = useDraw()
   const [searchKey, setSearchKey] = useState('')
   const [pageSize, setPageSize] = useState(20)
   const [pageNumber, setPageNumber] = useState(1)
+  const [selectedUserId, setSelectedUserId] = useState('')
 
   useEffect(() => {
     clearUsers()
@@ -65,24 +68,31 @@ export default function MainEventTab({ eventId }) {
           Search
         </Button>
       </Stack>
-      <InfiniteScroll
-        dataLength={pageSize}
-        hasMore={users.length === expectedUsersAmount ? false : true}
-        next={fetchNextData}
-        height={1200}
-        loader={
-          users.length <= expectedUsersAmount ? (
-            <></>
-          ) : (
-            <Typography variant="subtitle1" align="center" mt={1}>
-              Loading...
-            </Typography>
-          )
-        }
-      >
-        <TableContainer id="">
+      <TableContainer sx={{ position: 'relative' }}>
+        <InfiniteScroll
+          dataLength={pageSize}
+          hasMore={users.length === expectedUsersAmount ? false : true}
+          next={fetchNextData}
+          height={1200}
+          loader={
+            users.length <= expectedUsersAmount ? (
+              <></>
+            ) : (
+              <Typography variant="subtitle1" align="center" mt={1}>
+                Loading...
+              </Typography>
+            )
+          }
+        >
           <Table>
-            <TableHead>
+            <TableHead
+              sx={{
+                position: 'sticky',
+                top: 0,
+                bgcolor: theme.palette.grey[900],
+                zIndex: 500,
+              }}
+            >
               <TableRow>
                 <TableCell>Username</TableCell>
                 <TableCell>Entries</TableCell>
@@ -94,7 +104,7 @@ export default function MainEventTab({ eventId }) {
             <TableBody>
               {users &&
                 users.map((item, key) => (
-                  <TableRow key={key}>
+                  <TableRow key={key} hover={true}>
                     <TableCell>{item._id}</TableCell>
                     <TableCell>{item.ticketAmount}</TableCell>
                     <TableCell>Views Table</TableCell>
@@ -105,8 +115,8 @@ export default function MainEventTab({ eventId }) {
                 ))}
             </TableBody>
           </Table>
-        </TableContainer>
-      </InfiniteScroll>
+        </InfiniteScroll>
+      </TableContainer>
     </Stack>
   )
 }

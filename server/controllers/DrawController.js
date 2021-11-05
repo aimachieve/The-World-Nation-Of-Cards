@@ -100,7 +100,6 @@ exports.getRandomTablesByUserId = async (req, res) => {
  * @param {object} res
  */
 exports.searchData = async (req, res) => {
-  console.log(req.body)
   const { pageNumber, pageSize, key } = req.body
   console.log(pageNumber, pageSize, key)
   MainTicket.aggregate(
@@ -108,7 +107,8 @@ exports.searchData = async (req, res) => {
       { $match: { username: new RegExp(key) } },
       {
         $group: {
-          _id: '$username',
+          _id: '$user_id',
+          username: '$username',
           ticketAmount: { $sum: 1 },
           winAmount: {
             $sum: {
@@ -350,6 +350,61 @@ exports.getRandomTablesByDayIdAndRoomNumber = async (req, res) => {
     await resTables.push(table)
   }
   return res.status(200).json(resTables)
+}
+
+/**
+ * Get the tickets by user id
+ * @param {object} req
+ * @param {object} res
+ * @returns object
+ */
+exports.getTicketsByUserId = async (req, res) => {
+  const { userId } = req.params
+  const resData = []
+
+  //  Get the main event tickets
+  const numberOfMainTicketsByUserId = await MainTicket.aggregate([
+    { $match: { user_id: mongoose.Types.ObjectId(userId) } },
+    { $group: { _id: '$event', numberOfTickets: { $sum: 1 } } },
+  ])
+  for (let i = 0; i < numberOfMainTicketsByUserId.length; i += 1) {
+    let mainEvent = await Event.findById(numberOfMainTicketsByUserId[i]._id)
+    await resData.push({
+      _id: numberOfMainTicketsByUserId[i]._id,
+      purchaseData: 'Main',
+      eventTime: mainEvent.main.date,
+      quantity: numberOfMainTicketsByUserId[i].numberOfTickets,
+      result: mainEvent.status,
+    })
+  }
+
+  //  Get the satellite event tickets
+  const numberOfSatelliteTicketsByUserId = await SatelliteTicket.aggregate([
+    { $match: { user_id: mongoose.Types.ObjectId(userId) } },
+    { $group: { _id: '$satelliteId', numberOfTickets: { $sum: 1 } } },
+  ])
+  for (let i = 0; i < numberOfSatelliteTicketsByUserId.length; i += 1) {
+    let wholeEvent = await Event.findOne({
+      satellite: {
+        $elemMatch: {
+          _id: mongoose.Types.ObjectId(numberOfSatelliteTicketsByUserId[i]._id),
+        },
+      },
+    })
+
+    wholeEvent.satellite.map((item, index) => {
+      if (String(item._id) == numberOfSatelliteTicketsByUserId[i]._id) {
+        resData.push({
+          _id: numberOfSatelliteTicketsByUserId[i]._id,
+          purchaseData: `Satellite ${index + 1}`,
+          eventTime: item.date,
+          quantity: numberOfSatelliteTicketsByUserId[i].numberOfTickets,
+          result: item.status,
+        })
+      }
+    })
+  }
+  return res.status(200).json(resData)
 }
 
 /**

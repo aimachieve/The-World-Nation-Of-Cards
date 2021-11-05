@@ -15,6 +15,7 @@ const initialState = {
   currentDay: 0,
   finalWinner: [],
   loading: false,
+  tickets: [],
 }
 
 const handlers = {
@@ -90,6 +91,13 @@ const handlers = {
       finalWinner: action.payload,
     }
   },
+  SET_TICKETS: (state, action) => {
+    console.log(action.payload)
+    return {
+      ...state,
+      tickets: action.payload,
+    }
+  },
 }
 
 const reducer = (state, action) =>
@@ -127,6 +135,7 @@ const DrawContext = createContext({
   getFinalWinner: () => Promise.resolve(),
   sendEmailToAdmin: () => Promise.resolve(),
   getAllUsers: () => Promise.resolve(),
+  getTicketsByUserId: () => Promise.resolve(),
 })
 
 function DrawProvider({ children }) {
@@ -227,6 +236,7 @@ function DrawProvider({ children }) {
       ? await axios.post('/api/draw/search', { ...pageData, key })
       : await axios.post('/api/draw/getAllUsers', pageData)
     const { status, data } = response
+    console.log(data)
     if (status === 200) {
       dispatch({
         type: 'SET_EXPECTED_USERS_AMOUNT',
@@ -239,6 +249,17 @@ function DrawProvider({ children }) {
         payload: {
           users: data.data,
         },
+      })
+    }
+  }
+
+  const getTicketsByUserId = async (userId) => {
+    const response = await axios.get(`/api/draw/getTicketsByUserId/${userId}`)
+    const { status, data } = response
+    if (status === 200) {
+      dispatch({
+        type: 'SET_TICKETS',
+        payload: data,
       })
     }
   }
@@ -538,6 +559,7 @@ function DrawProvider({ children }) {
         getFinalWinner,
         sendEmailToAdmin,
         getAllUsers,
+        getTicketsByUserId,
       }}
     >
       {children}

@@ -14,10 +14,12 @@ import {
   Divider,
 } from '@material-ui/core'
 import InfiniteScroll from 'react-infinite-scroll-component'
+import { useTheme } from '@material-ui/private-theming'
 
 import useDraw from 'hooks/useDraw'
 
 export default function Satellite1Tab({ satelliteEventId }) {
+  const theme = useTheme()
   const {
     getSatelliteUsersByEventId,
     searchSatelliteUsersBySatelliteEventId,
@@ -83,24 +85,31 @@ export default function Satellite1Tab({ satelliteEventId }) {
           Search
         </Button>
       </Stack>
-      <InfiniteScroll
-        dataLength={pageSize}
-        hasMore={users.length === expectedUsersAmount ? false : true}
-        next={fetchNextData}
-        height={1200}
-        loader={
-          users.length <= expectedUsersAmount ? (
-            <></>
-          ) : (
-            <Typography variant="subtitle1" align="center" mt={1}>
-              Loading...
-            </Typography>
-          )
-        }
-      >
-        <TableContainer id="">
+      <TableContainer sx={{ position: 'relative' }}>
+        <InfiniteScroll
+          dataLength={pageSize}
+          hasMore={users.length === expectedUsersAmount ? false : true}
+          next={fetchNextData}
+          height={1200}
+          loader={
+            users.length <= expectedUsersAmount ? (
+              <></>
+            ) : (
+              <Typography variant="subtitle1" align="center" mt={1}>
+                Loading...
+              </Typography>
+            )
+          }
+        >
           <Table>
-            <TableHead>
+            <TableHead
+              sx={{
+                position: 'sticky',
+                top: 0,
+                bgcolor: theme.palette.grey[900],
+                zIndex: 500,
+              }}
+            >
               <TableRow>
                 <TableCell>Username</TableCell>
                 <TableCell>Entries</TableCell>
@@ -121,8 +130,8 @@ export default function Satellite1Tab({ satelliteEventId }) {
                 ))}
             </TableBody>
           </Table>
-        </TableContainer>
-      </InfiniteScroll>
+        </InfiniteScroll>
+      </TableContainer>
     </Stack>
   )
 }

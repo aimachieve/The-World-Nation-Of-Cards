@@ -31,6 +31,7 @@ router.put(
 )
 router.get('/getEventById/:_id', DrawController.getEventById)
 router.post('/sendEmailToAdmin', DrawController.sendEmailToAdmin)
+router.get('/getTicketsByUserId/:userId', DrawController.getTicketsByUserId)
 /*======================================*/
 router.post('/payment', DrawController.payment)
 
