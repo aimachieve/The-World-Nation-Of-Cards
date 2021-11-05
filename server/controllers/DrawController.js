@@ -510,6 +510,33 @@ exports.getCurrentEvent = async (req, res) => {
   })
 }
 
+exports.resetPassword = async (req, res) => {
+  console.log(req.body)
+  bcrypt.genSalt(10, (err, salt) => {
+    bcrypt.hash(req.body.password, salt, (err, hash) => {
+      if (err) throw err
+      console.log(hash)
+      User.findOneAndUpdate(
+        { _id: req.body.id },
+        {
+          $set: {
+            password: hash,
+          },
+        },
+      ).then((user) => {
+        console.log(user)
+        res.json({ 
+          success: 'true',
+          user: user 
+        })
+      })
+      .catch((err) => res.json({
+        succeess: 'false'
+      }))
+    })
+  })
+}
+
 /*========================= CartPage =============================*/
 exports.get_tickets = async (req, res) => {
   const current_event = await Event.findOne({ status: 0 })

@@ -123,12 +123,6 @@ export default function Account() {
                 </ListItem>
 
                 <ListItem>
-                  <ListItemButton component="a" href="/dashboard/addresses">
-                    Addresses
-                  </ListItemButton>
-                </ListItem>
-
-                <ListItem>
                   <ListItemButton component="a" href="/dashboard/account">
                     Account Details
                   </ListItemButton>

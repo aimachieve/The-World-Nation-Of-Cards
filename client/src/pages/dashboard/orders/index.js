@@ -151,12 +151,6 @@ export default function Orders() {
                 </ListItem>
 
                 <ListItem>
-                  <ListItemButton component="a" href="/dashboard/addresses">
-                    Addresses
-                  </ListItemButton>
-                </ListItem>
-
-                <ListItem>
                   <ListItemButton component="a" href="/dashboard/account">
                     Account Details
                   </ListItemButton>

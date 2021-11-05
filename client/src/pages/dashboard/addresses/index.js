@@ -50,12 +50,6 @@ export default function Addresses() {
                 </ListItem>
 
                 <ListItem>
-                  <ListItemButton component="a" href="/dashboard/addresses">
-                    Addresses
-                  </ListItemButton>
-                </ListItem>
-
-                <ListItem>
                   <ListItemButton component="a" href="/dashboard/account">
                     Account Details
                   </ListItemButton>

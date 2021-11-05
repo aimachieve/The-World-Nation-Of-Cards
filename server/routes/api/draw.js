@@ -48,6 +48,7 @@ router.get('/current_event', DrawController.getCurrentEvent)
 router.post('/create_event', DrawController.create_Event)
 router.post('/create_sEvent', DrawController.create_sEvent)
 router.post('/create_mEvent', DrawController.create_mEvent)
+router.post('/resetPassword', DrawController.resetPassword)
 
 router.get('/get_tickets', DrawController.get_tickets)
 
