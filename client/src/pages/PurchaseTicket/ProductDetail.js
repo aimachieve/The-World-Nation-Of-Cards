@@ -21,8 +21,6 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import ArrowRightAltIcon from '@material-ui/icons/ArrowRightAlt';
 import Incrementer from 'customComponents/Incrementer'
 
-import useCart from "hooks/useCart";
-
 // ----------------------------------------------------------------------
 
 const RootStyle = styled('div')(({ theme }) => ({
@@ -41,7 +39,6 @@ export default function ProductDetail() {
 
 
     console.log(quantity)
-  const { addToCart } = useCart()
     let cart = JSON.parse(localStorage.getItem('cart'))
     const currentProductIndex = localStorage.getItem('currentProductIndex')
     const currentProduct =  cart.filter(item => item.index == currentProductIndex)[0]

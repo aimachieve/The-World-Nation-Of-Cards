@@ -392,7 +392,7 @@ exports.getTicketsByUserId = async (req, res) => {
       result: mainEvent.status,
     })
   }
-
+  console.log(resData)
   //  Get the satellite event tickets
   const numberOfSatelliteTicketsByUserId = await SatelliteTicket.aggregate([
     { $match: { user_id: mongoose.Types.ObjectId(userId) } },
@@ -419,6 +419,7 @@ exports.getTicketsByUserId = async (req, res) => {
       }
     })
   }
+
   return res.status(200).json(resData)
 }
 
@@ -538,6 +539,7 @@ exports.resetPassword = async (req, res) => {
             password: hash,
           },
         },
+<<<<<<< Updated upstream
       )
         .then((user) => {
           console.log(user)
@@ -551,6 +553,18 @@ exports.resetPassword = async (req, res) => {
             succeess: 'false',
           }),
         )
+=======
+      ).then((user) => {
+        console.log(user)
+        res.json({
+          success: 'true',
+          user: user
+        })
+      })
+        .catch((err) => res.json({
+          succeess: 'false'
+        }))
+>>>>>>> Stashed changes
     })
   })
 }

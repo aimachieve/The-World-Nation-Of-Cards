@@ -194,7 +194,7 @@ export default function Orders() {
                           <TableRow key={ticket._id}>
                             <TableCell>{ticket.purchaseData}</TableCell>
                             <TableCell>
-                              {ticket.eventTime.split('T')[0]}
+                              {ticket.eventTime ? ticket.eventTime.split('T')[0] : ''}
                             </TableCell>
                             <TableCell>{ticket.quantity}</TableCell>
                             <TableCell>{resultFilter(ticket.result)}</TableCell>

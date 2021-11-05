@@ -153,7 +153,7 @@ function DrawProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState)
 
   useEffect(() => {
-    const initialize = async () => {}
+    const initialize = async () => { }
 
     initialize()
   }, [])
@@ -183,7 +183,7 @@ function DrawProvider({ children }) {
   const create_event = async (data) => {
     const response = await axios.post('/api/draw/create_event', data)
 
-    if (response.data == 'OK') {
+    if (response.data === 'OK') {
       dispatch(getCurrentEvent())
       dispatch(getAllDays())
     }
@@ -281,6 +281,7 @@ function DrawProvider({ children }) {
   const getTicketsByUserId = async (userId) => {
     const response = await axios.get(`/api/draw/getTicketsByUserId/${userId}`)
     const { status, data } = response
+    console.log(data)
     if (status === 200) {
       dispatch({
         type: 'SET_TICKETS',
@@ -389,7 +390,7 @@ function DrawProvider({ children }) {
       payload: false,
     })
 
-    if (response.data == 'OK') {
+    if (response.data === 'OK') {
       dispatch(getAllDays())
       dispatch(getCurrentEvent())
     }
