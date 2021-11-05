@@ -22,6 +22,7 @@ const ContentStyle = styled('div')(({ theme }) => ({
 
 export default function Dashboard() {
   const { logout } = useAuth();
+  const user = JSON.parse(localStorage.getItem('user'))
 
   return (
     <RootStyle>
@@ -62,7 +63,7 @@ export default function Dashboard() {
             <Grid item xs={12} md={9}>
               <Grid container sx={{padding: '0 20px'}}>
                 <Typography variant="h6" sx={{mb: 2, fontWeight: 300}}>
-                  Hello yousif21 (not yousif21 Logout)
+                  Hello <b> {user.role} </b> (not <b> {user.role} </b> Logout)
                 </Typography>
                 <Typography variant="h6" sx={{fontWeight: 300}}>
                   From your account dashboard you can view your recent orders, manage your shipping and billing addresses, and edit your password and account details.
