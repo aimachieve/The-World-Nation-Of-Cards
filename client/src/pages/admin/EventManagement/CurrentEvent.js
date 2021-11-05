@@ -64,7 +64,6 @@ export default function CurrentEvent() {
     getCurrentEvent()
   }, [])
 
-
   const style = {
     position: 'absolute',
     top: '50%',

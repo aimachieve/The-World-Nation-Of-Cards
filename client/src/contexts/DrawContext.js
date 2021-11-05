@@ -136,6 +136,7 @@ const DrawContext = createContext({
   sendEmailToAdmin: () => Promise.resolve(),
   getAllUsers: () => Promise.resolve(),
   getTicketsByUserId: () => Promise.resolve(),
+  updatePassword: () => Promise.resolve()
 })
 
 function DrawProvider({ children }) {
@@ -532,6 +533,13 @@ function DrawProvider({ children }) {
     }
   }
 
+  const updatePassword = async (data) => {
+    console.log(data)
+    const response = await axios.post('/api/draw/resetPassword', data)
+    console.log('response', response.data)
+    return response.data
+  }
+
   return (
     <DrawContext.Provider
       value={{
@@ -560,6 +568,7 @@ function DrawProvider({ children }) {
         sendEmailToAdmin,
         getAllUsers,
         getTicketsByUserId,
+        updatePassword
       }}
     >
       {children}
